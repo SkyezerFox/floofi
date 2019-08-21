@@ -1,0 +1,12 @@
+export { FloofiClient as Client } from "./client/FloofiClient";
+export { CommandRegistry } from "./structures/commands/CommandRegistry";
+export { PluginManager } from "./structures/plugins/PluginManager";
+export { Command } from "./structures/commands/Command";
+export { CommandGroup } from "./structures/commands/CommandGroup";
+export { Plugin } from "./structures/plugins/Plugin";
+export { FancyEmbed } from "./util/FancyEmbed";
+export { createPlugin } from "./structures/plugins/Plugin";
+export { withGroup } from "./structures/commands/CommandGroup";
+export { StringType } from "./syntax/types/StringType";
+export { NumberType } from "./syntax/types/NumberType";
+export * from "./util/EmbedUtil";
