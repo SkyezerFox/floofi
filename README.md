@@ -1,11 +1,68 @@
-# floofi - A Discord.JS wrapper I wrote for bot commissions
+<div align="center">
+  <br />
+  <p>
+    <a href="https://github.com/orifoxx/floofi"><img src="https://raw.githubusercontent.com/orifoxx/floofi/master/docs/assets/splash.png" width="546" alt="floofi" /></a>
+  </p>
+  <br />
+</div>
+
+## About
 
 This library has gone through too many rewrites.... I think this version might actually be usable.
 
-For many, the choice between Javascript and Python on the backend is a difficult one, but with the introduction of NodeJS a few years ago, I'd say that decision has been made for you. NodeJS eliminates the need for differeing languages between the frontend and backend, while also performing slightly better than Python.
+floofi is a wrapper for the already powerful [discord.js](https://discord.js.org) module, providing tools and utilities otherwise unavailable in the base library.
 
-There wasn't really a library similar to disco in the Javascript world, apart from Discord.JS's Commando library. So I figured I'd make one - I've tried to keep the library as simple as possible, keeping \(hopefully\) an intuitive structure to the library and client throughout.
+## Installation
 
-Work in Progress! Please be advised - this library is still a huge work-in-progress. There are still missing features, things that need a bit of ironing out etc. Feel free to submit merge requests, and I'll be sure to have a look at them.
+**I have not tested this library below Node.js 10.** I suggest you use the latest suggested version, as this is the version I'm developing the library in.
 
-If you have any questions/issues that aren't already answered here, feel free to contact me on Twitter, or Discord \(my username's ori\#0001\).
+Using [NPM](https://npmjs.org):
+
+`npm install floofi`
+
+Or, using [yarn](https://yarnpkg.org):
+
+`yarn add floofi`
+
+## Example usage
+
+```js
+const floofi = require("floofi");
+const client = new floofi.Client();
+
+client.on("ready", () => {
+	console.log(`Logged in as ${client.user.tag}!`);
+});
+
+client.add(
+	new floofi.Command("ping", 0, "", (client, message, arguments) => {
+		return message.reply("Pong!");
+	})
+);
+
+client.login("token");
+```
+
+or, using TypeScript:
+
+```ts
+import * as floofi from "floofi";
+const client = new floofi.Client();
+
+client.add(
+	new floofi.Command<[number, number]>(
+		"add",
+		0,
+		"a:number b:number",
+		(client, message, arguments) => {
+			return message.reply(arguments[0] + arguments[1]);
+		}
+	)
+);
+
+client.login("token");
+```
+
+## Help
+
+If you have any questions/issues that aren't already answered here, feel free to contact me on [Twitter](https://twitter.com/orifoxx).
