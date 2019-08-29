@@ -1,14 +1,12 @@
 import { Client, ClientOptions } from "discord.js";
 import * as winston from "winston";
 
-import * as Constants from "../util/Constants";
-
-import { CommandRegistry } from "../structures/commands/CommandRegistry";
-import {
-	PluginManager,
-	PluginManagerOptions,
-} from "../structures/plugins/PluginManager";
-import { SettingsProvider, SettingsProviderOptions } from "./SettingsProvider";
+import { SettingsProvider, SettingsProviderOptions } from "./providers/SettingsProvider";
+import { Command } from "./structures/commands/Command";
+import { CommandGroup } from "./structures/commands/CommandGroup";
+import { CommandRegistry } from "./structures/commands/CommandRegistry";
+import { PluginManager, PluginManagerOptions } from "./structures/plugins/PluginManager";
+import * as Constants from "./util/Constants";
 
 /**
  * FloofiClientOptions
@@ -46,6 +44,10 @@ export class FloofiClient extends Client {
 	public provider: SettingsProvider;
 
 	public logger: winston.Logger;
+
+	public add: (
+		...commandsOrGroup: Array<Command<any> | CommandGroup>
+	) => CommandRegistry;
 
 	// UTILITY METHODS
 
@@ -92,6 +94,10 @@ export class FloofiClient extends Client {
 		this.registry = new CommandRegistry(this, {
 			prefix: this.provider.options.defaults.guild.prefix,
 		});
+
+		// Bind the plugin manager to the add function
+		this.add = this.registry.add.bind(this.registry);
+
 		this.pluginManager = new PluginManager(
 			this,
 			this.options.pluginOptions,

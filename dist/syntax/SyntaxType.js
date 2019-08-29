@@ -42,7 +42,13 @@ class SyntaxType {
     isOptional(toggle = true) {
         this.options.optional = toggle;
     }
-    parse(client, value, index) {
+    /**
+     * Attempt to parse the given string argument into the type's output
+     * @param {FloofiClient} client - The client object
+     * @param {string} value - Value parsed from the message
+     * @param {number} index - Current index of the argument
+     */
+    parse(client, message, value, index) {
         throw Error("The SyntaxType class has no parse method");
     }
 }

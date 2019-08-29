@@ -2,21 +2,21 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const winston = require("winston");
-const Constants = require("../util/Constants");
 const CommandRegistry_1 = require("../structures/commands/CommandRegistry");
 const PluginManager_1 = require("../structures/plugins/PluginManager");
+const Constants = require("../util/Constants");
 const SettingsProvider_1 = require("./SettingsProvider");
 const DEFAULT_FLOOFI_OPTIONS = {
-    offline: false,
-    plugins: { watch: { include: [] } },
-    token: "",
     name: "floofi",
+    offline: false,
+    pluginOptions: { watch: { include: [] } },
+    token: "",
 };
 /**
  * Main client for interacting with Discord
  */
 class FloofiClient extends discord_js_1.Client {
-    // UTILITy METHODS
+    // UTILITY METHODS
     constructor(opts) {
         super(opts);
         this.options = Object.assign(DEFAULT_FLOOFI_OPTIONS, opts);
@@ -39,15 +39,20 @@ class FloofiClient extends discord_js_1.Client {
         this.registry = new CommandRegistry_1.CommandRegistry(this, {
             prefix: this.provider.options.defaults.guild.prefix,
         });
-        this.pluginManager = new PluginManager_1.PluginManager(this, this.options.plugins);
+        // Bind the plugin manager to the add function
+        this.add = this.registry.add.bind(this.registry);
+        this.pluginManager = new PluginManager_1.PluginManager(this, this.options.pluginOptions);
         this.on("debug", (m) => this.logger.debug(m));
         this.provider.on("error", (msg) => this.logger.error(`[settings] ${msg}`));
         this.provider.on("warn", (msg) => this.logger.warn(`[settings] ${msg}`));
+        this.on("error", (err) => this.logger.error(err));
         this.logger.verbose(`Using name "${this.options.name}"`);
         this.logger.verbose("READY woot we're all set to go!!! ^w^");
     }
     /**
-     * Log into Discord
+     * Log in to Discord
+     * @param {string} [token] - Token to use while connecting to Discord, defaults to the one provided in options.
+     * @param $number} [attempt=0] - Value used at runtime to determine how many times the login flow has been attempted - YOU SHOULDN'T USE THIS.
      */
     async login(token, attempt = 0) {
         this.logger.info("Logging in...");
@@ -104,6 +109,15 @@ class FloofiClient extends discord_js_1.Client {
             }
         }
         return this.options.token;
+    }
+    /**
+     * Set the SettingsProvider
+     * @param {Function} provider - The constructor function of the provider to use
+     * @param {*} opts - Options to parse to the provider at runtime
+     */
+    useProvider(provider, opts) {
+        this.provider = new provider(this, opts);
+        return this;
     }
 }
 exports.FloofiClient = FloofiClient;

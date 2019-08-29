@@ -1,6 +1,6 @@
 import { GuildMember, Message, MessageReaction, RichEmbed, User } from "discord.js";
 import { EventEmitter } from "events";
-import { FloofiClient } from "../../client/FloofiClient";
+import { FloofiClient } from "../../FloofiClient";
 /**
  * Class for representing a paged embed
  */

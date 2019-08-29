@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { FloofiClient } from "../../client/FloofiClient";
+import { FloofiClient } from "../../FloofiClient";
 import { FSWatcher } from "fs";
 import { Logger } from "winston";
 export interface PluginWatcherOptions {

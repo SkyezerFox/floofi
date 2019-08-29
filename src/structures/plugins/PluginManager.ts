@@ -1,7 +1,7 @@
 import { Collection } from "discord.js";
 import { EventEmitter } from "events";
 
-import { FloofiClient } from "../../client/FloofiClient";
+import { FloofiClient } from "../../FloofiClient";
 import { Plugin } from "./Plugin";
 import { PluginWatcher, PluginWatcherOptions } from "./PluginWatcher";
 

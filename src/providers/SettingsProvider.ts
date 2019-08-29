@@ -1,13 +1,7 @@
-import {
-	Guild,
-	GuildMember,
-	GuildMemberResolvable,
-	Role,
-	RoleResolvable,
-	User,
-} from "discord.js";
+import { Guild, GuildMember, GuildMemberResolvable, Role, RoleResolvable, User } from "discord.js";
 import { EventEmitter } from "events";
-import { FloofiClient } from "./FloofiClient";
+
+import { FloofiClient } from "../FloofiClient";
 
 /**
  * GuildSettings
@@ -156,13 +150,14 @@ export class SettingsProvider extends EventEmitter {
 	/**
 	 * Fetch permission level for given user id in given guild id
 	 * @param guild Guild ID
-	 * @param userID User ID
+	 * @param userID User ID\
 	 */
 	public async getUserPermission(
 		guild: string,
 		userID: string,
 	): Promise<number> {
 		const userPerms = await this.getProp(guild, "userPermissions");
+
 		if (userPerms[userID]) {
 			return userPerms[userID];
 		} else {
@@ -177,6 +172,7 @@ export class SettingsProvider extends EventEmitter {
 	 */
 	public async getRolePermission(guild: string, roleID: string) {
 		const rolePerms = await this.getProp(guild, "rolePermissions");
+
 		if (rolePerms[roleID]) {
 			return rolePerms[roleID];
 		} else {

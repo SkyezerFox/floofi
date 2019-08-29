@@ -2,8 +2,8 @@ import { Collection } from "discord.js";
 import { EventEmitter } from "events";
 import { Logger } from "winston";
 
-import { FloofiClient } from "../../client/FloofiClient";
-import { SettingsProvider } from "../../client/SettingsProvider";
+import { FloofiClient } from "../../FloofiClient";
+import { SettingsProvider } from "../../providers/SettingsProvider";
 import { ClientEvents, ClientEventType } from "../../util/ClientEvents";
 import { Command } from "../commands/Command";
 import { CommandGroup } from "../commands/CommandGroup";

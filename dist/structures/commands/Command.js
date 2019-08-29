@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const SyntaxParseError_1 = require("../../syntax/SyntaxParseError");
 const SyntaxParser_1 = require("../../syntax/SyntaxParser");
+const SyntaxParserError_1 = require("../../syntax/SyntaxParserError");
 const EmbedUtil_1 = require("../../util/EmbedUtil");
 const DEFAULT_COMMAND_OPTIONS = {};
 /**
@@ -14,7 +14,7 @@ class Command {
         this.options = {
             name,
             permissionLevel,
-            syntax: this.parser.types,
+            syntax: this.parser.syntax,
         };
         this.options = Object.assign(this.options, DEFAULT_COMMAND_OPTIONS);
         this.options = Object.assign(this.options, opts);
@@ -31,30 +31,46 @@ class Command {
      * @param message The message to run the command with
      * @param depth The depth the command was called at
      */
-    run(client, message, depth) {
+    async run(client, message, depth) {
+        client.logger.debug(`[cmds][${this.name}] Checking if member has permission to run command...`);
+        if (!(await client.provider.hasPermission(message.member, this.options.permissionLevel))) {
+            client.logger.debug(`[cmds][${this.name}] No permission - preventing execution.`);
+            return;
+        }
+        client.logger.debug(`[cmds][${this.name}] Has permission - parsing syntax...`);
         let args;
         try {
-            args = this.parser.parse(client, message.content
+            args = this.parser.parse(client, message, message.content
                 .trim()
                 .split(" ")
                 .slice(depth + 1));
         }
         catch (err) {
-            let msg = "Oops! Something went wrong behind the scence. How about you try again?";
-            if (err instanceof SyntaxParseError_1.SyntaxParseError) {
+            let msg = "Oops! Something went wrong behind the scenes. If this keeps happening, DM an admin.";
+            if (err instanceof SyntaxParserError_1.SyntaxParserError) {
                 switch (err.type) {
                     case "INTERNAL_ERROR": {
-                        msg =
-                            "Oops! Something went wrong behind the scence. How about you try again?";
+                        console.error(err);
+                        client.logger.error(err);
+                        client.logger.error("---------------");
+                        break;
                     }
                     case "PARSE_ERROR": {
                         msg = `Oops! Couldn't parse \`${err.arg}\` to type \`${err.syntax ? err.syntax.typeName : "none"}\`.`;
+                        break;
                     }
                 }
             }
+            else {
+                console.error(err);
+                client.logger.error(err);
+                client.logger.error("---------------");
+            }
             return message.channel.send(EmbedUtil_1.smallErrorEmbed(msg));
         }
+        client.logger.debug(`[cmds][${this.name}] Syntax OK - proceeding with execution...`);
         this.executor(client, message, args);
+        client.logger.debug(`[cmds][${this.name}] Execution OK.`);
     }
     /**
      * Checks whether the given alias is an alias of the command
@@ -70,7 +86,9 @@ class Command {
      * @param description Description to use
      */
     withDescription(description) {
-        this.options.help = Object.assign(this.options.help, { description });
+        this.options.help = Object.assign(this.options.help || {}, {
+            description,
+        });
         return this;
     }
 }

@@ -1,6 +1,6 @@
 import { Collection, GuildMember, Message } from "discord.js";
 
-import { FloofiClient } from "../../client/FloofiClient";
+import { FloofiClient } from "../../FloofiClient";
 import { Command } from "./Command";
 import { CommandGroup, GroupTree } from "./CommandGroup";
 

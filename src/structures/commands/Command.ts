@@ -1,8 +1,8 @@
 import { Message, RichEmbed } from "discord.js";
 
-import { FloofiClient } from "../../client/FloofiClient";
-import { SyntaxParseError } from "../../syntax/SyntaxParseError";
-import { ReturnableParserType, SyntaxParser } from "../../syntax/SyntaxParser";
+import { FloofiClient } from "../../FloofiClient";
+import { ParseableType, SyntaxParser } from "../../syntax/SyntaxParser";
+import { SyntaxParserError } from "../../syntax/SyntaxParserError";
 import { SyntaxType } from "../../syntax/SyntaxType";
 import { smallErrorEmbed } from "../../util/EmbedUtil";
 
@@ -19,8 +19,8 @@ interface CommandHelp {
 interface CommandOptions {
 	name: string;
 	syntax:
-		| Array<SyntaxType<ReturnableParserType>>
-		| Array<Array<SyntaxType<ReturnableParserType>>>;
+		| Array<SyntaxType<ParseableType>>
+		| Array<Array<SyntaxType<ParseableType>>>;
 	permissionLevel: number;
 
 	aliases?: string[];
@@ -29,7 +29,7 @@ interface CommandOptions {
 }
 
 // Represents the command executor type
-type Executor<ArgumentTypes extends ReturnableParserType[] = []> = (
+type Executor<ArgumentTypes extends ParseableType[] = []> = (
 	client: FloofiClient,
 	message: Message,
 	args: ArgumentTypes,
@@ -40,19 +40,14 @@ const DEFAULT_COMMAND_OPTIONS: ExtraCommandOptions = {};
 /**
  * Class for creating commands
  */
-export class Command<ArgumentTypes extends ReturnableParserType[] = []> {
+export class Command<ArgumentTypes extends ParseableType[] = []> {
 	public options: CommandOptions;
 	public executor: Executor<ArgumentTypes>;
-	public parser: SyntaxParser;
+	public parser: SyntaxParser<ArgumentTypes>;
 
 	constructor(
 		name: string,
-		syntax:
-			| string
-			| string[]
-			| string[][]
-			| Array<Array<SyntaxType<ReturnableParserType>>>
-			| Array<SyntaxType<ReturnableParserType>>,
+		syntax: string | string[],
 
 		permissionLevel: number,
 		executor: Executor<ArgumentTypes>,
@@ -64,7 +59,7 @@ export class Command<ArgumentTypes extends ReturnableParserType[] = []> {
 		this.options = {
 			name,
 			permissionLevel,
-			syntax: this.parser.types,
+			syntax: this.parser.syntax,
 		};
 
 		this.options = Object.assign(this.options, DEFAULT_COMMAND_OPTIONS);
@@ -86,9 +81,7 @@ export class Command<ArgumentTypes extends ReturnableParserType[] = []> {
 	 */
 	public async run(client: FloofiClient, message: Message, depth: number) {
 		client.logger.debug(
-			`[cmds][${
-				this.name
-			}] Checking if member has permission to run command...`,
+			`[cmds][${this.name}] Checking if member has permission to run command...`,
 		);
 		if (
 			!(await client.provider.hasPermission(
@@ -110,6 +103,7 @@ export class Command<ArgumentTypes extends ReturnableParserType[] = []> {
 		try {
 			args = this.parser.parse(
 				client,
+				message,
 				message.content
 					.trim()
 					.split(" ")
@@ -118,7 +112,7 @@ export class Command<ArgumentTypes extends ReturnableParserType[] = []> {
 		} catch (err) {
 			let msg =
 				"Oops! Something went wrong behind the scenes. If this keeps happening, DM an admin.";
-			if (err instanceof SyntaxParseError) {
+			if (err instanceof SyntaxParserError) {
 				switch (err.type) {
 					case "INTERNAL_ERROR": {
 						console.error(err);

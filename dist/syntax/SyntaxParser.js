@@ -1,141 +1,216 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const SyntaxParseError_1 = require("./SyntaxParseError");
-const SyntaxType_1 = require("./SyntaxType");
-const NumberType_1 = require("./types/NumberType");
-const StringType_1 = require("./types/StringType");
+const SyntaxParserError_1 = require("./SyntaxParserError");
+const Any_1 = require("./types/Any");
+const Boolean_1 = require("./types/Boolean");
+const Number_1 = require("./types/Number");
+const String_1 = require("./types/String");
+// Array of valid type names
+const validTypes = [
+    "boolean",
+    "number",
+    "string",
+    "channel",
+    "member",
+    "guild",
+    "role",
+    "user",
+];
+// #region Matching RegExps
 /**
- * Class for dealing with syntax
+ * Base RegExp used for testing validity of syntax strings.
+ */
+const validStringTest = new RegExp(`[a-zA-z]+:(${validTypes.join("|")})(\\?)?(\.{3})?`);
+/**
+ * Captures argument names.
+ */
+const typeNameMatcher = new RegExp(`[a-zA-z]+(?=:(${validTypes.join("|")})(\\?)?(\.{3})?)`);
+/**
+ * Captures argument type.
+ */
+const typeMatcher = new RegExp(`(?<=[a-zA-z]+:)(${validTypes.join("|")})(?=(\\?)?(\.{3})?)`);
+/**
+ * Captures argument optionality.
+ */
+const optionalMatcher = new RegExp(`(?<=[a-zA-z]+:(${validTypes.join("|")}))(\\?)?(?=(\.{3})?)`);
+/**
+ * Captures whether or not an argument is rest.
+ */
+const restMatcher = new RegExp(`(?<=[a-zA-z]+:(${validTypes.join("|")})(\\?)?)(\.{3})?`);
+// #endregion
+const typeMap = {
+    any: Any_1.AnyType,
+    boolean: Boolean_1.BooleanType,
+    number: Number_1.NumberType,
+    string: String_1.StringType,
+};
+/**
+ * Util function that creates types from string representnations
+ * @param type
+ */
+const createType = (name, type, extras) => {
+    return new typeMap[type](name, extras);
+};
+/**
+ * Class for dealing with syntax parsing
  */
 class SyntaxParser {
     constructor(syntax) {
         if (syntax instanceof Array) {
-            if (syntax.slice(0, 1)[0] instanceof SyntaxType_1.SyntaxType) {
-                this.types = syntax;
-            }
-            else {
-                this.types = syntax.map((v) => this.stringArrayToTypes(v));
-            }
+            this.multiSyntax = true;
+            this._syntax = syntax;
         }
         else {
-            this.types = this.stringArrayToTypes(syntax);
+            this.multiSyntax = false;
+            this._syntax = syntax.split(" ");
         }
-        // If multiple syntaxes are provided - ensures the longest matching syntax is always tested first
-        if (this.types instanceof Array &&
-            this.types.slice(0, 1)[0] instanceof Array) {
-            this.types.sort((a, b) => b.length - a.length);
-        }
+        this._flags = [];
+        this.syntax = [];
+        this.flags = [];
+        this.refresh();
+    }
+    // #region SyntaxParser methods
+    /**
+     * Add a syntax variant to the parser.
+     * @param syntax Syntax to add
+     */
+    addSyntax(syntax) {
+        this._syntax.push(syntax);
+        this.refresh();
+        return this;
     }
     /**
-     * Converts a syntax string array into
-     * @param syntaxString The syntax string/type string array to convert to types
+     * Remove a syntax variant from the parser.
+     * @param index Index of the variant
      */
-    stringArrayToTypes(syntaxString) {
-        if (syntaxString instanceof Array) {
-            return this._arrToTypes(syntaxString);
-        }
-        else {
-            return this._arrToTypes(syntaxString.split(" "));
-        }
+    removeSyntax(index) {
+        this._syntax.splice(index, 1);
+        this.refresh();
+        return this;
     }
     /**
-     * Parses strings to the arguments
-     * @param args Arguments to parse
+     * Add a flag to the syntax parser.
+     * @param flagName Name of the flag, and possible aliases
+     * @param syntax Syntax parsing to perform on the flag
      */
-    parse(client, args) {
-        let normalArgs = [];
-        let restArgs = [];
-        // If multiple syntaxes are provided
-        if (this.types instanceof Array &&
-            this.types.slice(0, 1)[0] instanceof Array) {
-            const errors = [];
-            let parsedArgs;
-            for (let i = 0; i < this.types.length; i++) {
-                try {
-                    const syntax = this.types[i];
-                    normalArgs = args;
-                    if (args.length > syntax.length) {
-                        if (!syntax[syntax.length - 1].rest) {
-                            throw new SyntaxParseError_1.SyntaxParseError("INTERNAL_ERROR");
-                        }
-                        normalArgs = args.slice(0, syntax.length - 1);
-                        restArgs = args.slice(syntax.length - 1);
-                    }
-                    else if (args.length < syntax.length) {
-                        // Missing required arguments
-                        if (!syntax[args.length].optional) {
-                            throw new SyntaxParseError_1.SyntaxParseError("PARSE_ERROR");
-                        }
-                    }
-                    // Map the args with assigned syntaxes to their parsed values - parse the rest values to the rest type
-                    parsedArgs = normalArgs
-                        .map((v, j) => {
-                        return syntax[j].parse(client, v, j);
-                    })
-                        .concat(restArgs.map((v, j) => syntax[syntax.length - 1].parse(client, v, j)));
-                    break;
-                }
-                catch (err) {
-                    errors.push(err);
-                }
-            }
-            if (!parsedArgs && errors.length >= 1) {
-                throw errors[0];
-            }
-            else {
-                return args;
-            }
-        }
-        try {
-            const syntax = this.types;
-            if (args.length > syntax.length) {
-                if (!syntax[syntax.length - 1].rest) {
-                    throw new SyntaxParseError_1.SyntaxParseError("INTERNAL_ERROR");
-                }
-                normalArgs = args.slice(0, syntax.length - 1);
-                restArgs = args.slice(syntax.length - 1);
-            }
-            return normalArgs
-                .map((v, j) => syntax[j].parse(client, v, j))
-                .concat(restArgs.map((v, i) => syntax[syntax.length - 1].parse(client, v, i)));
-        }
-        catch (err) {
-            throw new Error(err);
-        }
+    addFlag(flagName, syntax) {
+        this._flags.push([flagName, syntax]);
+        this.refresh();
+        return this;
     }
-    _arrToTypes(str) {
-        return str.map((v) => {
-            let rest = false;
-            const nameArr = v.split(":");
-            if (v.split(":")[1].startsWith("...")) {
-                rest = true;
+    /**
+     * Remove a flag from the parser.
+     * @param flagName Name or alias of the flag
+     */
+    removeFlag(flagName) {
+        const flagToRemove = this._flags.find((v) => {
+            if (v[0] instanceof Array) {
+                return v[0].reduce((equals, val, i) => (equals ? val === flagName : false), true);
             }
-            const type = rest
-                ? nameArr[1].endsWith(">") || nameArr[1].endsWith("]")
-                    ? nameArr[1].slice(3, -1)
-                    : nameArr[1].slice(3)
-                : nameArr[1].endsWith(">") || nameArr[1].endsWith("]")
-                    ? nameArr[1].slice(0, -1)
-                    : nameArr[1];
-            const name = nameArr[0].startsWith("<") || nameArr[0].startsWith("[")
-                ? nameArr[0].slice(1)
-                : nameArr[0];
-            switch (type) {
-                case "string": {
-                    return new StringType_1.StringType(name, {
-                        rest,
-                    });
-                }
-                case "number": {
-                    return new NumberType_1.NumberType(name, {
-                        rest,
-                    });
-                }
-                default: {
-                    throw Error(`Invalid type "${v}"`);
-                }
-            }
+            return v[0] === flagName;
         });
+        if (!flagToRemove) {
+            return this;
+        }
+        this._flags.splice(this._flags.indexOf(flagToRemove), 1);
+        this.refresh();
+        return this;
+    }
+    /**
+     * Parses message content into valid values
+     */
+    parse(client, message, args) {
+        const parsedSyntax = [];
+        let onRestArgument = false;
+        // Check if missing required arguments
+        const missingOptionalArguments = this.syntax.reduce((failed, syntax, i) => {
+            if (failed) {
+                return failed;
+            }
+            // if syntax is required
+            if (!syntax.isOptional) {
+                // if no argument exists
+                if (!args[i]) {
+                    return i;
+                }
+            }
+            return null;
+        }, null);
+        // If there are missing required arguments, throw
+        if (missingOptionalArguments) {
+            throw new SyntaxParserError_1.SyntaxParserError("PARSE_ERROR", {
+                index: missingOptionalArguments,
+                syntax: this.syntax[missingOptionalArguments],
+            });
+        }
+        // If there are too many arguments, and the last argument isn't rest
+        if (args.length > this.syntax.length &&
+            !this.syntax[this.syntax.length - 1].isOptional) {
+            throw new SyntaxParserError_1.SyntaxParserError("PARSE_ERROR", {
+                arg: args[this.syntax.length],
+                index: this.syntax.length,
+            });
+        }
+        // Actual syntax parsing
+        args.forEach((v, i) => {
+            const syntaxIndex = onRestArgument ? i : this.syntax.length - 1;
+            if (this.syntax[i].isRest) {
+                onRestArgument = true;
+            }
+            parsedSyntax.push(this.syntax[syntaxIndex].parse(client, message, v, i));
+        });
+        return parsedSyntax;
+    }
+    // #endregion
+    //#region SyntaxParser Private Methods
+    /**
+     * Refreshes the syntax types by checking if they have been updated.
+     */
+    refresh() {
+        if (this._syntax.length !== this.syntax.length) {
+            this.syntax = this._syntax.map((s) => this.createType(s));
+        }
+        if (this._flags.length !== this.flags.length) {
+            this.flags = this._flags.map((f) => this.createFlag(f));
+        }
+        return this;
+    }
+    /**
+     * Creates a syntax type from a string.
+     * @param s String representation of the type
+     */
+    createType(s) {
+        const valid = validStringTest.test(s);
+        const typeMatch = s.match(typeMatcher);
+        const typeNameMatch = s.match(typeNameMatcher);
+        // Check if syntax string is valid
+        if (!typeNameMatch) {
+            throw new SyntaxParserError_1.SyntaxParserError("INTERNAL_ERROR", {
+                message: `Invalid type name`,
+            });
+        }
+        if (!typeMatch) {
+            throw new SyntaxParserError_1.SyntaxParserError("INTERNAL_ERROR", {
+                message: "Invalid type",
+            });
+        }
+        if (!valid) {
+            throw new SyntaxParserError_1.SyntaxParserError("INTERNAL_ERROR", {
+                message: "Invalid syntax string",
+            });
+        }
+        const type = typeMatch[0];
+        const typeName = typeNameMatch[0];
+        const rest = restMatcher.test(s);
+        const optional = optionalMatcher.test(s);
+        return createType(typeName, type, { rest, optional });
+    }
+    /**
+     * Creates a syntax flag from a string
+     * @param f String representation of the flag
+     */
+    createFlag(f) {
+        return "";
     }
 }
 exports.SyntaxParser = SyntaxParser;

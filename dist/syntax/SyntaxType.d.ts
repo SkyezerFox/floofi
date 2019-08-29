@@ -1,5 +1,7 @@
-import { FloofiClient } from "../client/FloofiClient";
-import { ReturnableParserType } from "./SyntaxParser";
+import { Message } from "discord.js";
+import { FloofiClient } from "../FloofiClient";
+import { ParseableType } from "./SyntaxParser";
+export declare type SyntaxTypeConstructor = new (name: string, extras?: Partial<SyntaxTypeOptions>) => SyntaxType<any>;
 export interface SyntaxTypeOptions {
     optional: boolean;
     rest: boolean;
@@ -8,7 +10,7 @@ export declare const DEFAULT_SYNTAX_OPTIONS: SyntaxTypeOptions;
 /**
  * Class for representing syntax types
  */
-export declare class SyntaxType<Type extends ReturnableParserType> {
+export declare abstract class SyntaxType<Type extends ParseableType> {
     /**
      * Returns whether the argument is rest
      */
@@ -31,5 +33,11 @@ export declare class SyntaxType<Type extends ReturnableParserType> {
      * @param toggle Whether the argument is optional or not
      */
     isOptional(toggle?: boolean): void;
-    parse(client: FloofiClient, value: string, index: number): Type;
+    /**
+     * Attempt to parse the given string argument into the type's output
+     * @param {FloofiClient} client - The client object
+     * @param {string} value - Value parsed from the message
+     * @param {number} index - Current index of the argument
+     */
+    parse(client: FloofiClient, message: Message, value: string, index: number): Type;
 }

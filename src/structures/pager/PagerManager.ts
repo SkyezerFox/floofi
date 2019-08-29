@@ -1,6 +1,6 @@
 import { Collection, Message, RichEmbed, TextChannel } from "discord.js";
 
-import { FloofiClient } from "../../client/FloofiClient";
+import { FloofiClient } from "../../FloofiClient";
 import { PagedEmbed } from "./PagedEmbed";
 
 /**

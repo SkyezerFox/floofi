@@ -1,6 +1,6 @@
 import { RichEmbed } from "discord.js";
 
-import { FloofiClient } from "../client/FloofiClient";
+import { FloofiClient } from "../FloofiClient";
 import { FancyEmbed } from "./FancyEmbed";
 
 /**

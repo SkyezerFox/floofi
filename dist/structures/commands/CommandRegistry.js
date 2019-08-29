@@ -35,7 +35,9 @@ class CommandRegistry {
             if (cmd.options.aliases) {
                 cmd.options.aliases.forEach((v) => this.commandAliasMap.set(v, cmd.options.name));
             }
+            this.client.logger.debug(`[cmds] Added group "${cmd.name}" to the top-level registry.`);
         });
+        this.client.logger.debug(`[cmds] Added ${cmds.length} commands to the top-level registry.`);
     }
     /**
      * Specifically adds groups to the registry
@@ -45,7 +47,9 @@ class CommandRegistry {
         groups.forEach((group) => {
             this.groups.set(group.name, group);
             group.aliases.forEach((v) => this.groupAliasMap.set(v, group.name));
+            this.client.logger.debug(`[cmds] Added group "${group.name}" to the top-level registry.`);
         });
+        this.client.logger.debug(`[cmds] Added ${groups.length} groups to the top-level registry.`);
     }
     /**
      * Adds groups/commands to the registry
@@ -95,6 +99,7 @@ class CommandRegistry {
         if (!message.content.startsWith(prefix)) {
             return;
         }
+        this.client.logger.debug(`[cmds] Message "${message.id}" is potentially a command - looking further...`);
         const args = message.content
             .slice(prefix.length)
             .trim()
@@ -103,13 +108,15 @@ class CommandRegistry {
         const group = this.groups.get(groupName) ||
             this.groups.get(this.groupAliasMap.get(args[0]) || "");
         if (groupName && group) {
-            const groupCmd = group.findFromArgs(args);
+            this.client.logger.debug(`[cmds][${message.id}] Group "${group.name}" matches - looking for commands...`);
+            const groupCmd = group.findFromArgs(args.slice(1));
             if (groupCmd) {
+                this.client.logger.debug(`[cmds][${message.id}] Found command "${groupCmd[0].name}" (depth ${groupCmd[1]}) in group "${group.name}".`);
                 return groupCmd;
             }
+            this.client.logger.debug(`[cmds][${message.id}] No matches.`);
         }
         const cmd = this.commands.get(args[0]);
-        console.log(cmd);
         if (cmd) {
             return [cmd, 0];
         }
@@ -144,9 +151,11 @@ class CommandRegistry {
      */
     async createHelpData(member) {
         const permissionLevel = await this.client.provider.getUserPermission(member.guild.id, member.id);
-        const unravel = (tree, name) => tree.commands.map((cmd) => `${name} ${cmd.name} - ${cmd.options.help ? cmd.options.help.description || "No description provided." : "No description provided."}`);
+        const unravel = (tree, name) => tree.commands.map((cmd) => `${name} ${cmd.name} - ${cmd.options.help
+            ? cmd.options.help.description ||
+                "No description provided."
+            : "No description provided."}`);
         const tree = this.fetchCommandTree();
-        unravel();
     }
 }
 exports.CommandRegistry = CommandRegistry;

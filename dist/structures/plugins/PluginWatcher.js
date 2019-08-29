@@ -22,15 +22,13 @@ class PluginWatcher extends events_1.EventEmitter {
      */
     async init() {
         this.logger.verbose("[plugins][watcher] Looking for files...");
-        await new Promise((resolve, reject) => {
-            this.options.include.forEach((v) => glob(v, async (err, files) => {
-                if (err) {
-                    reject(err);
-                }
-                await Promise.all(files.map(async (path) => this.paths.push(path)));
-                resolve();
-            }));
-        });
+        await Promise.all(this.options.include.map((v) => new Promise((resolve, reject) => glob(v, async (err, files) => {
+            if (err) {
+                reject(err);
+            }
+            files.forEach((path) => this.paths.push(path));
+            resolve();
+        }))));
         this.logger.info(`[plugins][watcher] Have ${this.paths.length} paths to watch.`);
         this.paths.forEach(async (path) => {
             if (!fs_1.existsSync(path)) {

@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { FloofiClient } from "../../client/FloofiClient";
+import { FloofiClient } from "../../FloofiClient";
 
 import { existsSync, FSWatcher, Stats, watch, watchFile } from "fs";
 import * as glob from "glob";

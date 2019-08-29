@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 
-import { FloofiClient } from "../../client/FloofiClient";
+import { FloofiClient } from "../../FloofiClient";
 import { SyntaxParserError } from "../SyntaxParserError";
 import { DEFAULT_SYNTAX_OPTIONS, SyntaxType, SyntaxTypeOptions } from "../SyntaxType";
 
@@ -17,6 +17,9 @@ export const DEFAULT_STRINGTYPE_OPTIONS: StringTypeOptions = Object.assign(
 	},
 );
 
+/**
+ * Syntax type for representing strings.
+ */
 export class StringType extends SyntaxType<string> {
 	public typeName = "string";
 	public options: StringTypeOptions;
