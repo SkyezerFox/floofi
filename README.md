@@ -1,4 +1,4 @@
-# Introduction
+# floofi - A Discord.JS wrapper I wrote for bot commissions
 
 This library has gone through too many rewrites.... I think this version might actually be usable.
 
@@ -9,4 +9,3 @@ There wasn't really a library similar to disco in the Javascript world, apart fr
 Work in Progress! Please be advised - this library is still a huge work-in-progress. There are still missing features, things that need a bit of ironing out etc. Feel free to submit merge requests, and I'll be sure to have a look at them.
 
 If you have any questions/issues that aren't already answered here, feel free to contact me on Twitter, or Discord \(my username's ori\#0001\).
-
