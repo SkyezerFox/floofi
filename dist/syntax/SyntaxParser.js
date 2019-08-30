@@ -1,10 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const SyntaxParserError_1 = require("./SyntaxParserError");
-const Any_1 = require("./types/Any");
-const Boolean_1 = require("./types/Boolean");
-const Number_1 = require("./types/Number");
-const String_1 = require("./types/String");
+const types = require("./types");
 // Array of valid type names
 const validTypes = [
     "boolean",
@@ -39,10 +36,16 @@ const optionalMatcher = new RegExp(`(?<=[a-zA-z]+:(${validTypes.join("|")}))(\\?
 const restMatcher = new RegExp(`(?<=[a-zA-z]+:(${validTypes.join("|")})(\\?)?)(\.{3})?`);
 // #endregion
 const typeMap = {
-    any: Any_1.AnyType,
-    boolean: Boolean_1.BooleanType,
-    number: Number_1.NumberType,
-    string: String_1.StringType,
+    any: types.AnyType,
+    boolean: types.BooleanType,
+    number: types.NumberType,
+    string: types.StringType,
+    channel: types.ChannelType,
+    invite: types.InviteType,
+    member: types.MemberType,
+    role: types.RoleType,
+    user: types.UserType,
+    vc: types.VCType,
 };
 /**
  * Util function that creates types from string representnations
@@ -119,7 +122,7 @@ class SyntaxParser {
     /**
      * Parses message content into valid values
      */
-    parse(client, message, args) {
+    async parse(client, message, args) {
         const parsedSyntax = [];
         let onRestArgument = false;
         // Check if missing required arguments
@@ -152,7 +155,8 @@ class SyntaxParser {
             });
         }
         // Actual syntax parsing
-        args.forEach((v, i) => {
+        /** @todo Support asynchronous types */
+        args.forEach(async (v, i) => {
             if (!onRestArgument && this.syntax[i].isRest) {
                 onRestArgument = true;
             }
@@ -163,10 +167,10 @@ class SyntaxParser {
                 parsedSyntax.push([syntax.parse(client, message, v, i)]);
             }
             else if (onRestArgument) {
-                parsedSyntax[syntaxIndex].push(syntax.parse(client, message, v, i));
+                parsedSyntax[syntaxIndex].push(await syntax.parse(client, message, v, i));
             }
             else {
-                parsedSyntax.push(syntax.parse(client, message, v, i));
+                await parsedSyntax.push(syntax.parse(client, message, v, i));
             }
         });
         return parsedSyntax;

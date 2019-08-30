@@ -21,9 +21,6 @@ export class MemoryProvider extends SettingsProvider {
 	}
 
 	public async init() {
-		this.client.logger.verbose(
-			'[settings] Using provider "MemoryProvider"',
-		);
 		return true;
 	}
 }

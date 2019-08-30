@@ -1,4 +1,10 @@
 export { AnyType } from "./Any";
 export { BooleanType } from "./Boolean";
+export { ChannelType } from "./Channel";
+export { InviteType } from "./Invite";
+export { MemberType } from "./Member";
 export { NumberType } from "./Number";
+export { RoleType } from "./Role";
 export { StringType } from "./String";
+export { UserType } from "./User";
+export { VCType } from "./VC";

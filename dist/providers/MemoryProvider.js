@@ -16,7 +16,6 @@ class MemoryProvider extends __1.SettingsProvider {
         return true;
     }
     async init() {
-        this.client.logger.verbose('[settings] Using provider "MemoryProvider"');
         return true;
     }
 }

@@ -1,12 +1,11 @@
-import { Channel, GuildMember, Message, PartialGuild, Role, TextChannel, User } from "discord.js";
+import {
+    Channel, GuildMember, Invite, Message, Role, TextChannel, User, VoiceChannel
+} from "discord.js";
 
 import { FloofiClient } from "../FloofiClient";
 import { SyntaxParserError } from "./SyntaxParserError";
 import { SyntaxType, SyntaxTypeConstructor, SyntaxTypeOptions } from "./SyntaxType";
-import { AnyType } from "./types/Any";
-import { BooleanType } from "./types/Boolean";
-import { NumberType } from "./types/Number";
-import { StringType } from "./types/String";
+import * as types from "./types";
 
 // Type definitions
 export type ParseableType =
@@ -15,7 +14,8 @@ export type ParseableType =
 	| string
 	| Channel
 	| GuildMember
-	| PartialGuild
+	| Invite
+	| VoiceChannel
 	| Role
 	| TextChannel
 	| User;
@@ -88,11 +88,18 @@ const restMatcher = new RegExp(
 // #endregion
 
 const typeMap: { [x: string]: SyntaxTypeConstructor } = {
-	any: AnyType,
+	any: types.AnyType,
 
-	boolean: BooleanType,
-	number: NumberType,
-	string: StringType,
+	boolean: types.BooleanType,
+	number: types.NumberType,
+	string: types.StringType,
+
+	channel: types.ChannelType,
+	invite: types.InviteType,
+	member: types.MemberType,
+	role: types.RoleType,
+	user: types.UserType,
+	vc: types.VCType,
 };
 
 /**
@@ -202,7 +209,11 @@ export class SyntaxParser<T extends ReturnableType[]> {
 	/**
 	 * Parses message content into valid values
 	 */
-	public parse(client: FloofiClient, message: Message, args: string[]): T {
+	public async parse(
+		client: FloofiClient,
+		message: Message,
+		args: string[],
+	): Promise<T> {
 		const parsedSyntax: ReturnableType[] = [];
 
 		let onRestArgument = false;
@@ -247,7 +258,8 @@ export class SyntaxParser<T extends ReturnableType[]> {
 		}
 
 		// Actual syntax parsing
-		args.forEach((v, i) => {
+		/** @todo Support asynchronous types */
+		args.forEach(async (v, i) => {
 			if (!onRestArgument && this.syntax[i].isRest) {
 				onRestArgument = true;
 			}
@@ -260,10 +272,10 @@ export class SyntaxParser<T extends ReturnableType[]> {
 				parsedSyntax.push([syntax.parse(client, message, v, i)]);
 			} else if (onRestArgument) {
 				(parsedSyntax[syntaxIndex] as ParseableType[]).push(
-					syntax.parse(client, message, v, i),
+					await syntax.parse(client, message, v, i),
 				);
 			} else {
-				parsedSyntax.push(syntax.parse(client, message, v, i));
+				await parsedSyntax.push(syntax.parse(client, message, v, i));
 			}
 		});
 
