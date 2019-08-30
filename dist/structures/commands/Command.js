@@ -62,13 +62,18 @@ class Command {
                 }
             }
             else {
+                client.logger
+                    .error("-".repeat(64))
+                    .error(`Error while executing command "${this.name}"`)
+                    .error("-".repeat(64));
                 console.error(err);
-                client.logger.error(err);
-                client.logger.error("---------------");
+                client.logger.error(err).error("-".repeat(64));
             }
             return message.channel.send(EmbedUtil_1.smallErrorEmbed(msg));
         }
         client.logger.debug(`[cmds][${this.name}] Syntax OK - proceeding with execution...`);
+        client.logger.info(`[cmd] ${message.author.tag}` +
+            `(${message.author.id}/${message.guild.id}:${message.channel.id}) => ${this.options.name}`);
         this.executor(client, message, args);
         client.logger.debug(`[cmds][${this.name}] Execution OK.`);
     }

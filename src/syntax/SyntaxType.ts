@@ -9,11 +9,13 @@ export type SyntaxTypeConstructor = new (
 ) => SyntaxType<any>;
 
 export interface SyntaxTypeOptions {
+	concat: boolean;
 	optional: boolean;
 	rest: boolean;
 }
 
 export const DEFAULT_SYNTAX_OPTIONS: SyntaxTypeOptions = {
+	concat: false,
 	optional: false,
 	rest: false,
 };
@@ -35,6 +37,11 @@ export abstract class SyntaxType<Type extends ParseableType> {
 	get optional() {
 		return this.options.optional;
 	}
+
+	get concat() {
+		return this.options.concat;
+	}
+
 	public typeName = "SyntaxType";
 	public name: string;
 
@@ -50,7 +57,7 @@ export abstract class SyntaxType<Type extends ParseableType> {
 	}
 
 	/**
-	 * Makes the argument rest, or sets rest mode to the provided arg
+	 * Makes the argument rest, or sets rest mode on this arg.
 	 * @param toggle Whether the argument is rest or not
 	 */
 	public isRest(toggle = true) {
@@ -58,11 +65,19 @@ export abstract class SyntaxType<Type extends ParseableType> {
 	}
 
 	/**
-	 * Makes the argument optional, or sets optional status to the provided arg
+	 * Makes the argument optional, or sets optional status on this arg.
 	 * @param toggle Whether the argument is optional or not
 	 */
 	public isOptional(toggle = true) {
 		this.options.optional = toggle;
+	}
+
+	/**
+	 * Makes the argument concatenable, or sets concatenation enabled on this arg.
+	 * @param toggle Whether or not the argument is concatenable
+	 */
+	public isConcat(toggle = true) {
+		this.options.concat = toggle;
 	}
 
 	/**

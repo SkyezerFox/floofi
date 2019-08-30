@@ -2,12 +2,14 @@ import { Channel, GuildMember, Message, PartialGuild, Role, TextChannel, User } 
 import { FloofiClient } from "../FloofiClient";
 import { SyntaxType } from "./SyntaxType";
 export declare type ParseableType = boolean | number | string | Channel | GuildMember | PartialGuild | Role | TextChannel | User;
+export declare type ReturnableType = ParseableType | ParseableType[];
+export declare type ExtractParseableType<T extends ReturnableType> = T extends ParseableType[] ? ParseableType[][number] : T;
 export declare type ParseableTypeRepresentation = "boolean" | "number" | "string" | "channel" | "guild" | "member" | "role" | "user";
 /**
  * Class for dealing with syntax parsing
  */
-export declare class SyntaxParser<T extends ParseableType[]> {
-    syntax: Array<SyntaxType<T[number]>>;
+export declare class SyntaxParser<T extends ReturnableType[]> {
+    syntax: Array<SyntaxType<ExtractParseableType<T[number]>>>;
     flags: any[];
     multiSyntax: boolean;
     private _syntax;

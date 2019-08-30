@@ -83,8 +83,16 @@ export declare class SettingsProvider extends EventEmitter {
     /**
      * Get the permission level of the member
      * @param member
+     *
+     * @deprecated
      */
     getPermission(member: GuildMember): Promise<number>;
+    /**
+     * Get whether the member has permission
+     * @param member
+     * @param requiredPermission
+     */
+    getPermissionWithRequired(member: GuildMember, requiredPermission: number): Promise<boolean>;
     /**
      * Fetch permission level for given user id in given guild id
      * @param guild Guild ID

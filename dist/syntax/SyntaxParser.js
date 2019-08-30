@@ -153,11 +153,21 @@ class SyntaxParser {
         }
         // Actual syntax parsing
         args.forEach((v, i) => {
-            const syntaxIndex = onRestArgument ? i : this.syntax.length - 1;
-            if (this.syntax[i].isRest) {
+            if (!onRestArgument && this.syntax[i].isRest) {
                 onRestArgument = true;
             }
-            parsedSyntax.push(this.syntax[syntaxIndex].parse(client, message, v, i));
+            const syntaxIndex = onRestArgument ? this.syntax.length - 1 : i;
+            const syntax = this.syntax[syntaxIndex];
+            // If on the first rest argument
+            if (onRestArgument && i === syntaxIndex) {
+                parsedSyntax.push([syntax.parse(client, message, v, i)]);
+            }
+            else if (onRestArgument) {
+                parsedSyntax[syntaxIndex].push(syntax.parse(client, message, v, i));
+            }
+            else {
+                parsedSyntax.push(syntax.parse(client, message, v, i));
+            }
         });
         return parsedSyntax;
     }

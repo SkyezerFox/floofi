@@ -1,7 +1,7 @@
 import { Message, RichEmbed } from "discord.js";
 
 import { FloofiClient } from "../../FloofiClient";
-import { ParseableType, SyntaxParser } from "../../syntax/SyntaxParser";
+import { ParseableType, ReturnableType, SyntaxParser } from "../../syntax/SyntaxParser";
 import { SyntaxParserError } from "../../syntax/SyntaxParserError";
 import { SyntaxType } from "../../syntax/SyntaxType";
 import { smallErrorEmbed } from "../../util/EmbedUtil";
@@ -18,9 +18,7 @@ interface CommandHelp {
 
 interface CommandOptions {
 	name: string;
-	syntax:
-		| Array<SyntaxType<ParseableType>>
-		| Array<Array<SyntaxType<ParseableType>>>;
+	syntax: Array<SyntaxType<ParseableType>>;
 	permissionLevel: number;
 
 	aliases?: string[];
@@ -29,7 +27,7 @@ interface CommandOptions {
 }
 
 // Represents the command executor type
-type Executor<ArgumentTypes extends ParseableType[] = []> = (
+type Executor<ArgumentTypes extends ReturnableType[] = []> = (
 	client: FloofiClient,
 	message: Message,
 	args: ArgumentTypes,
@@ -40,7 +38,7 @@ const DEFAULT_COMMAND_OPTIONS: ExtraCommandOptions = {};
 /**
  * Class for creating commands
  */
-export class Command<ArgumentTypes extends ParseableType[] = []> {
+export class Command<ArgumentTypes extends ReturnableType[] = []> {
 	public options: CommandOptions;
 	public executor: Executor<ArgumentTypes>;
 	public parser: SyntaxParser<ArgumentTypes>;
@@ -129,9 +127,12 @@ export class Command<ArgumentTypes extends ParseableType[] = []> {
 					}
 				}
 			} else {
+				client.logger
+					.error("-".repeat(64))
+					.error(`Error while executing command "${this.name}"`)
+					.error("-".repeat(64));
 				console.error(err);
-				client.logger.error(err);
-				client.logger.error("---------------");
+				client.logger.error(err).error("-".repeat(64));
 			}
 
 			return message.channel.send(smallErrorEmbed(msg));
@@ -140,7 +141,13 @@ export class Command<ArgumentTypes extends ParseableType[] = []> {
 		client.logger.debug(
 			`[cmds][${this.name}] Syntax OK - proceeding with execution...`,
 		);
-		this.executor(client, message, args as ArgumentTypes);
+
+		client.logger.info(
+			`[cmd] ${message.author.tag}` +
+				`(${message.author.id}/${message.guild.id}:${message.channel.id}) => ${this.options.name}`,
+		);
+
+		this.executor(client, message, args);
 
 		client.logger.debug(`[cmds][${this.name}] Execution OK.`);
 	}

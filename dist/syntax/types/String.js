@@ -11,7 +11,8 @@ exports.DEFAULT_STRINGTYPE_OPTIONS = Object.assign(SyntaxType_1.DEFAULT_SYNTAX_O
  */
 class StringType extends SyntaxType_1.SyntaxType {
     constructor(name, extras) {
-        super(name, extras);
+        // Enable concat
+        super(name, Object.assign(extras, { concat: true }));
         this.typeName = "string";
         this.options = Object.assign(exports.DEFAULT_STRINGTYPE_OPTIONS, extras);
     }

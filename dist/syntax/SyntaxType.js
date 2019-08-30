@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DEFAULT_SYNTAX_OPTIONS = {
+    concat: false,
     optional: false,
     rest: false,
 };
@@ -28,19 +29,29 @@ class SyntaxType {
     get optional() {
         return this.options.optional;
     }
+    get concat() {
+        return this.options.concat;
+    }
     /**
-     * Makes the argument rest, or sets rest mode to the provided arg
+     * Makes the argument rest, or sets rest mode on this arg.
      * @param toggle Whether the argument is rest or not
      */
     isRest(toggle = true) {
         this.options.rest = toggle;
     }
     /**
-     * Makes the argument optional, or sets optional status to the provided arg
+     * Makes the argument optional, or sets optional status on this arg.
      * @param toggle Whether the argument is optional or not
      */
     isOptional(toggle = true) {
         this.options.optional = toggle;
+    }
+    /**
+     * Makes the argument concatenable, or sets concatenation enabled on this arg.
+     * @param toggle Whether or not the argument is concatenable
+     */
+    isConcat(toggle = true) {
+        this.options.concat = toggle;
     }
     /**
      * Attempt to parse the given string argument into the type's output

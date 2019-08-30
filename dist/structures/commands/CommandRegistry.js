@@ -87,7 +87,6 @@ class CommandRegistry {
      * @param command Command to run
      */
     run(message, command, depth) {
-        this.client.logger.info(`[cmd] ${message.author.tag} (${message.author.id}/${message.guild.id}:${message.channel.id}) => ${command.options.name}`);
         return command.run(this.client, message, depth);
     }
     /**
@@ -151,7 +150,7 @@ class CommandRegistry {
      */
     async createHelpData(member) {
         const permissionLevel = await this.client.provider.getUserPermission(member.guild.id, member.id);
-        const unravel = (tree, name) => tree.commands.map((cmd) => `${name} ${cmd.name} - ${cmd.options.help
+        const unravel = (groupTree, name) => groupTree.commands.map((cmd) => `${name} ${cmd.name} - ${cmd.options.help
             ? cmd.options.help.description ||
                 "No description provided."
             : "No description provided."}`);

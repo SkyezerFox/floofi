@@ -127,24 +127,76 @@ export class SettingsProvider extends EventEmitter {
 	 * Check if a guild member has the given permission level
 	 */
 	public async hasPermission(member: GuildMember, permissionLevel: number) {
-		return (await this.getPermission(member)) >= permissionLevel;
+		this.client.logger.debug(
+			`[settings] Performing lookup for "${member.id}" in "${member.guild.id}"...`,
+		);
+
+		return await this.getPermissionWithRequired(member, permissionLevel);
 	}
 
 	/**
 	 * Get the permission level of the member
 	 * @param member
+	 *
+	 * @deprecated
 	 */
 	public async getPermission(member: GuildMember) {
+		const rolePermissions = [];
+
+		const roleKeys = member.roles.keyArray();
+
+		for (const i in roleKeys) {
+			if (roleKeys[i]) {
+				rolePermissions.push(
+					await this.getRolePermission(member.guild.id, roleKeys[i]),
+				);
+			}
+		}
+
 		return Math.max(
-			...(await Promise.all(
-				member.roles.map(
-					async (v) =>
-						await this.getRolePermission(member.guild.id, v.id),
-				),
-			)),
+			...rolePermissions,
 			await this.getUserPermission(member.guild.id, member.id),
-			this.options.overrides[member.id],
+			this.options.overrides[member.id] || 0,
 		);
+	}
+
+	/**
+	 * Get whether the member has permission
+	 * @param member
+	 * @param requiredPermission
+	 */
+	public async getPermissionWithRequired(
+		member: GuildMember,
+		requiredPermission: number,
+	) {
+		// Check overrides
+		if (this.options.overrides[member.id] >= requiredPermission) {
+			return true;
+		}
+
+		// Check roles
+		const roleKeys = member.roles.keyArray();
+
+		for (const i in roleKeys) {
+			if (roleKeys[i]) {
+				const permissionLevel = await this.getRolePermission(
+					member.guild.id,
+					roleKeys[i],
+				);
+				if (permissionLevel >= requiredPermission) {
+					return true;
+				}
+			}
+		}
+
+		// Check user
+		if (
+			(await this.getUserPermission(member.guild.id, member.id)) >=
+			requiredPermission
+		) {
+			return true;
+		}
+		return false;
 	}
 
 	/**

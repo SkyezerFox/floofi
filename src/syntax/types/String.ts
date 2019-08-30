@@ -25,7 +25,8 @@ export class StringType extends SyntaxType<string> {
 	public options: StringTypeOptions;
 
 	constructor(name: string, extras?: Partial<StringTypeOptions>) {
-		super(name, extras);
+		// Enable concat
+		super(name, Object.assign(extras, { concat: true }));
 
 		this.options = Object.assign(DEFAULT_STRINGTYPE_OPTIONS, extras);
 	}

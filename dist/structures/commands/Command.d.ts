@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import { FloofiClient } from "../../FloofiClient";
-import { ParseableType, SyntaxParser } from "../../syntax/SyntaxParser";
+import { ParseableType, ReturnableType, SyntaxParser } from "../../syntax/SyntaxParser";
 import { SyntaxType } from "../../syntax/SyntaxType";
 interface ExtraCommandOptions {
     aliases?: string[];
@@ -12,17 +12,17 @@ interface CommandHelp {
 }
 interface CommandOptions {
     name: string;
-    syntax: Array<SyntaxType<ParseableType>> | Array<Array<SyntaxType<ParseableType>>>;
+    syntax: Array<SyntaxType<ParseableType>>;
     permissionLevel: number;
     aliases?: string[];
     guild?: string;
     help?: CommandHelp;
 }
-declare type Executor<ArgumentTypes extends ParseableType[] = []> = (client: FloofiClient, message: Message, args: ArgumentTypes) => any;
+declare type Executor<ArgumentTypes extends ReturnableType[] = []> = (client: FloofiClient, message: Message, args: ArgumentTypes) => any;
 /**
  * Class for creating commands
  */
-export declare class Command<ArgumentTypes extends ParseableType[] = []> {
+export declare class Command<ArgumentTypes extends ReturnableType[] = []> {
     options: CommandOptions;
     executor: Executor<ArgumentTypes>;
     parser: SyntaxParser<ArgumentTypes>;

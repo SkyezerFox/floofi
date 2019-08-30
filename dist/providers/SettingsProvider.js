@@ -63,14 +63,51 @@ class SettingsProvider extends events_1.EventEmitter {
      * Check if a guild member has the given permission level
      */
     async hasPermission(member, permissionLevel) {
-        return (await this.getPermission(member)) >= permissionLevel;
+        this.client.logger.debug(`[settings] Performing lookup for "${member.id}" in "${member.guild.id}"...`);
+        return await this.getPermissionWithRequired(member, permissionLevel);
     }
     /**
      * Get the permission level of the member
      * @param member
+     *
+     * @deprecated
      */
     async getPermission(member) {
-        return Math.max(...(await Promise.all(member.roles.map(async (v) => await this.getRolePermission(member.guild.id, v.id)))), await this.getUserPermission(member.guild.id, member.id), this.options.overrides[member.id]);
+        const rolePermissions = [];
+        const roleKeys = member.roles.keyArray();
+        for (const i in roleKeys) {
+            if (roleKeys[i]) {
+                rolePermissions.push(await this.getRolePermission(member.guild.id, roleKeys[i]));
+            }
+        }
+        return Math.max(...rolePermissions, await this.getUserPermission(member.guild.id, member.id), this.options.overrides[member.id] || 0);
+    }
+    /**
+     * Get whether the member has permission
+     * @param member
+     * @param requiredPermission
+     */
+    async getPermissionWithRequired(member, requiredPermission) {
+        // Check overrides
+        if (this.options.overrides[member.id] >= requiredPermission) {
+            return true;
+        }
+        // Check roles
+        const roleKeys = member.roles.keyArray();
+        for (const i in roleKeys) {
+            if (roleKeys[i]) {
+                const permissionLevel = await this.getRolePermission(member.guild.id, roleKeys[i]);
+                if (permissionLevel >= requiredPermission) {
+                    return true;
+                }
+            }
+        }
+        // Check user
+        if ((await this.getUserPermission(member.guild.id, member.id)) >=
+            requiredPermission) {
+            return true;
+        }
+        return false;
     }
     /**
      * Fetch permission level for given user id in given guild id

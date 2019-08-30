@@ -123,12 +123,6 @@ export class CommandRegistry {
 	 * @param command Command to run
 	 */
 	public run(message: Message, command: Command<any>, depth: number) {
-		this.client.logger.info(
-			`[cmd] ${message.author.tag} (${message.author.id}/${
-				message.guild.id
-			}:${message.channel.id}) => ${command.options.name}`,
-		);
-
 		return command.run(this.client, message, depth);
 	}
 
@@ -146,9 +140,7 @@ export class CommandRegistry {
 		}
 
 		this.client.logger.debug(
-			`[cmds] Message "${
-				message.id
-			}" is potentially a command - looking further...`,
+			`[cmds] Message "${message.id}" is potentially a command - looking further...`,
 		);
 
 		const args = message.content
@@ -163,18 +155,14 @@ export class CommandRegistry {
 
 		if (groupName && group) {
 			this.client.logger.debug(
-				`[cmds][${message.id}] Group "${
-					group.name
-				}" matches - looking for commands...`,
+				`[cmds][${message.id}] Group "${group.name}" matches - looking for commands...`,
 			);
 
 			const groupCmd = group.findFromArgs(args.slice(1));
 
 			if (groupCmd) {
 				this.client.logger.debug(
-					`[cmds][${message.id}] Found command "${
-						groupCmd[0].name
-					}" (depth ${groupCmd[1]}) in group "${group.name}".`,
+					`[cmds][${message.id}] Found command "${groupCmd[0].name}" (depth ${groupCmd[1]}) in group "${group.name}".`,
 				);
 				return groupCmd;
 			}
@@ -226,8 +214,8 @@ export class CommandRegistry {
 			member.id,
 		);
 
-		const unravel = (tree: GroupTree, name: string) =>
-			tree.commands.map(
+		const unravel = (groupTree: GroupTree, name: string) =>
+			groupTree.commands.map(
 				(cmd) =>
 					`${name} ${cmd.name} - ${
 						cmd.options.help

@@ -20,6 +20,11 @@ export type ParseableType =
 	| TextChannel
 	| User;
 
+export type ReturnableType = ParseableType | ParseableType[];
+export type ExtractParseableType<
+	T extends ReturnableType
+> = T extends ParseableType[] ? ParseableType[][number] : T;
+
 export type ParseableTypeRepresentation =
 	| "boolean"
 	| "number"
@@ -105,8 +110,8 @@ const createType = (
 /**
  * Class for dealing with syntax parsing
  */
-export class SyntaxParser<T extends ParseableType[]> {
-	public syntax: Array<SyntaxType<T[number]>>;
+export class SyntaxParser<T extends ReturnableType[]> {
+	public syntax: Array<SyntaxType<ExtractParseableType<T[number]>>>;
 	public flags: any[];
 
 	public multiSyntax: boolean;
@@ -198,7 +203,7 @@ export class SyntaxParser<T extends ParseableType[]> {
 	 * Parses message content into valid values
 	 */
 	public parse(client: FloofiClient, message: Message, args: string[]): T {
-		const parsedSyntax: ParseableType[] = [];
+		const parsedSyntax: ReturnableType[] = [];
 
 		let onRestArgument = false;
 
@@ -243,14 +248,23 @@ export class SyntaxParser<T extends ParseableType[]> {
 
 		// Actual syntax parsing
 		args.forEach((v, i) => {
-			const syntaxIndex = onRestArgument ? i : this.syntax.length - 1;
-
-			if (this.syntax[i].isRest) {
+			if (!onRestArgument && this.syntax[i].isRest) {
 				onRestArgument = true;
 			}
-			parsedSyntax.push(
-				this.syntax[syntaxIndex].parse(client, message, v, i),
-			);
+
+			const syntaxIndex = onRestArgument ? this.syntax.length - 1 : i;
+			const syntax = this.syntax[syntaxIndex];
+
+			// If on the first rest argument
+			if (onRestArgument && i === syntaxIndex) {
+				parsedSyntax.push([syntax.parse(client, message, v, i)]);
+			} else if (onRestArgument) {
+				(parsedSyntax[syntaxIndex] as ParseableType[]).push(
+					syntax.parse(client, message, v, i),
+				);
+			} else {
+				parsedSyntax.push(syntax.parse(client, message, v, i));
+			}
 		});
 
 		return parsedSyntax as T;
@@ -279,9 +293,7 @@ export class SyntaxParser<T extends ParseableType[]> {
 	 * Creates a syntax type from a string.
 	 * @param s String representation of the type
 	 */
-	private createType<S extends ParseableType>(
-		s: string,
-	): SyntaxType<ParseableType> {
+	private createType(s: string): SyntaxType<ExtractParseableType<T[number]>> {
 		const valid = validStringTest.test(s);
 
 		const typeMatch = s.match(typeMatcher);
