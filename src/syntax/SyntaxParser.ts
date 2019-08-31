@@ -1,10 +1,20 @@
 import {
-    Channel, GuildMember, Invite, Message, Role, TextChannel, User, VoiceChannel
+	Channel,
+	GuildMember,
+	Invite,
+	Message,
+	Role,
+	TextChannel,
+	User,
 } from "discord.js";
 
 import { FloofiClient } from "../FloofiClient";
 import { SyntaxParserError } from "./SyntaxParserError";
-import { SyntaxType, SyntaxTypeConstructor, SyntaxTypeOptions } from "./SyntaxType";
+import {
+	SyntaxType,
+	SyntaxTypeConstructor,
+	SyntaxTypeOptions,
+} from "./SyntaxType";
 import * as types from "./types";
 
 // Type definitions
@@ -15,7 +25,6 @@ export type ParseableType =
 	| Channel
 	| GuildMember
 	| Invite
-	| VoiceChannel
 	| Role
 	| TextChannel
 	| User;
@@ -31,9 +40,11 @@ export type ParseableTypeRepresentation =
 	| "string"
 	| "channel"
 	| "guild"
+	| "invite"
 	| "member"
 	| "role"
-	| "user";
+	| "user"
+	| "vc";
 
 // Array of valid type names
 const validTypes = [
@@ -44,8 +55,10 @@ const validTypes = [
 	"channel",
 	"member",
 	"guild",
+	"invite",
 	"role",
 	"user",
+	"vc",
 ];
 
 // #region Matching RegExps
@@ -180,16 +193,15 @@ export class SyntaxParser<T extends ReturnableType[]> {
 		this.refresh();
 		return this;
 	}
-
-	/**
+	/*
 	 * Remove a flag from the parser.
 	 * @param flagName Name or alias of the flag
-	 */
+	 *
 	public removeFlag(flagName: string) {
 		const flagToRemove = this._flags.find((v) => {
 			if (v[0] instanceof Array) {
 				return v[0].reduce<boolean>(
-					(equals, val, i) => (equals ? val === flagName : false),
+					(equals, val) => (equals ? val === flagName : false),
 					true,
 				);
 			}
@@ -204,7 +216,8 @@ export class SyntaxParser<T extends ReturnableType[]> {
 
 		this.refresh();
 		return this;
-	}
+    }
+    */
 
 	/**
 	 * Parses message content into valid values
@@ -259,7 +272,10 @@ export class SyntaxParser<T extends ReturnableType[]> {
 
 		// Actual syntax parsing
 		/** @todo Support asynchronous types */
-		args.forEach(async (v, i) => {
+
+		for (let i = 0; i < args.length; i++) {
+			const arg = args[i];
+
 			if (!onRestArgument && this.syntax[i].isRest) {
 				onRestArgument = true;
 			}
@@ -267,18 +283,18 @@ export class SyntaxParser<T extends ReturnableType[]> {
 			const syntaxIndex = onRestArgument ? this.syntax.length - 1 : i;
 			const syntax = this.syntax[syntaxIndex];
 
-			// If on the first rest argument
 			if (onRestArgument && i === syntaxIndex) {
-				parsedSyntax.push([syntax.parse(client, message, v, i)]);
+				parsedSyntax.push([
+					await syntax.parse(client, message, arg, i),
+				]);
 			} else if (onRestArgument) {
 				(parsedSyntax[syntaxIndex] as ParseableType[]).push(
-					await syntax.parse(client, message, v, i),
+					await syntax.parse(client, message, arg, i),
 				);
 			} else {
-				await parsedSyntax.push(syntax.parse(client, message, v, i));
+				parsedSyntax.push(await syntax.parse(client, message, arg, i));
 			}
-		});
-
+		}
 		return parsedSyntax as T;
 	}
 

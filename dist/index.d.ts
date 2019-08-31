@@ -9,7 +9,6 @@ export { SettingsProvider, DEFAULT_GUILD_SETTINGS, GuildSettings, } from "./prov
 export { createPlugin } from "./structures/plugins/Plugin";
 export { withGroup } from "./structures/commands/CommandGroup";
 import * as Providers from "./providers";
-import * as syntax from "./syntax";
 import * as Util from "./util";
-declare const SyntaxTypes: typeof syntax.types;
-export { Util, Providers, SyntaxTypes };
+export { TYPES } from "./syntax";
+export { Util, Providers };

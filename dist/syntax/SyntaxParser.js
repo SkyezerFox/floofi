@@ -10,8 +10,10 @@ const validTypes = [
     "channel",
     "member",
     "guild",
+    "invite",
     "role",
     "user",
+    "vc",
 ];
 // #region Matching RegExps
 /**
@@ -101,24 +103,31 @@ class SyntaxParser {
         this.refresh();
         return this;
     }
-    /**
+    /*
      * Remove a flag from the parser.
      * @param flagName Name or alias of the flag
-     */
-    removeFlag(flagName) {
+     *
+    public removeFlag(flagName: string) {
         const flagToRemove = this._flags.find((v) => {
             if (v[0] instanceof Array) {
-                return v[0].reduce((equals, val, i) => (equals ? val === flagName : false), true);
+                return v[0].reduce<boolean>(
+                    (equals, val) => (equals ? val === flagName : false),
+                    true,
+                );
             }
             return v[0] === flagName;
         });
+
         if (!flagToRemove) {
             return this;
         }
+
         this._flags.splice(this._flags.indexOf(flagToRemove), 1);
+
         this.refresh();
         return this;
     }
+    */
     /**
      * Parses message content into valid values
      */
@@ -156,23 +165,25 @@ class SyntaxParser {
         }
         // Actual syntax parsing
         /** @todo Support asynchronous types */
-        args.forEach(async (v, i) => {
+        for (let i = 0; i < args.length; i++) {
+            const arg = args[i];
             if (!onRestArgument && this.syntax[i].isRest) {
                 onRestArgument = true;
             }
             const syntaxIndex = onRestArgument ? this.syntax.length - 1 : i;
             const syntax = this.syntax[syntaxIndex];
-            // If on the first rest argument
             if (onRestArgument && i === syntaxIndex) {
-                parsedSyntax.push([syntax.parse(client, message, v, i)]);
+                parsedSyntax.push([
+                    await syntax.parse(client, message, arg, i),
+                ]);
             }
             else if (onRestArgument) {
-                parsedSyntax[syntaxIndex].push(await syntax.parse(client, message, v, i));
+                parsedSyntax[syntaxIndex].push(await syntax.parse(client, message, arg, i));
             }
             else {
-                await parsedSyntax.push(syntax.parse(client, message, v, i));
+                parsedSyntax.push(await syntax.parse(client, message, arg, i));
             }
-        });
+        }
         return parsedSyntax;
     }
     // #endregion

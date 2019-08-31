@@ -6,5 +6,5 @@ var SyntaxParserError_1 = require("./SyntaxParserError");
 exports.SyntaxParserError = SyntaxParserError_1.SyntaxParserError;
 var SyntaxType_1 = require("./SyntaxType");
 exports.SyntaxType = SyntaxType_1.SyntaxType;
-const types = require("./types");
-exports.types = types;
+const TYPES = require("./types");
+exports.TYPES = TYPES;

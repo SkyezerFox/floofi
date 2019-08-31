@@ -40,7 +40,7 @@ class Command {
         client.logger.debug(`[cmds][${this.name}] Has permission - parsing syntax...`);
         let args;
         try {
-            args = this.parser.parse(client, message, message.content
+            args = await this.parser.parse(client, message, message.content
                 .trim()
                 .split(" ")
                 .slice(depth + 1));

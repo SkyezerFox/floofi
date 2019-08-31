@@ -24,6 +24,6 @@ import * as Providers from "./providers";
 import * as syntax from "./syntax";
 import * as Util from "./util";
 
-const SyntaxTypes = syntax.types;
+export { TYPES } from "./syntax";
 
-export { Util, Providers, SyntaxTypes };
+export { Util, Providers };

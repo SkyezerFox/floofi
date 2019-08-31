@@ -2,6 +2,6 @@ export { SyntaxParser, ParseableTypeRepresentation } from "./SyntaxParser";
 export { SyntaxParserError } from "./SyntaxParserError";
 export { SyntaxType, SyntaxTypeOptions } from "./SyntaxType";
 
-import * as types from "./types";
+import * as TYPES from "./types";
 
-export { types };
+export { TYPES };

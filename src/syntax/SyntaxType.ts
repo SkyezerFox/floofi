@@ -23,7 +23,9 @@ export const DEFAULT_SYNTAX_OPTIONS: SyntaxTypeOptions = {
 /**
  * Class for representing syntax types
  */
-export abstract class SyntaxType<Type extends ParseableType> {
+export abstract class SyntaxType<
+	Type extends ParseableType | Promise<ParseableType>
+> {
 	/**
 	 * Returns whether the argument is rest
 	 */
@@ -91,7 +93,7 @@ export abstract class SyntaxType<Type extends ParseableType> {
 		message: Message,
 		value: string,
 		index: number,
-	): Type {
+	): Type | Promise<Type> {
 		throw Error("The SyntaxType class has no parse method");
 	}
 }

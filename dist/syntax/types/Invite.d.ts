@@ -1,10 +1,10 @@
-import { Message } from "discord.js";
+import { Invite, Message } from "discord.js";
 import { FloofiClient } from "../../FloofiClient";
 import { SyntaxType } from "../SyntaxType";
 /**
  * Syntax type used to effectively disable syntax parsing.
  */
-export declare class InviteType extends SyntaxType<any> {
+export declare class InviteType extends SyntaxType<Invite> {
     typeName: string;
-    parse(client: FloofiClient, message: Message, arg: string, index: number): Promise<void>;
+    parse(client: FloofiClient, message: Message, arg: string, index: number): Promise<Invite>;
 }

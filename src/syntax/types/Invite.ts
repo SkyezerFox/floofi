@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Invite, Message } from "discord.js";
 
 import { FloofiClient } from "../../FloofiClient";
 import { SyntaxParserError } from "../SyntaxParserError";
@@ -7,7 +7,7 @@ import { SyntaxType } from "../SyntaxType";
 /**
  * Syntax type used to effectively disable syntax parsing.
  */
-export class InviteType extends SyntaxType<any> {
+export class InviteType extends SyntaxType<Invite> {
 	public typeName = "invite";
 
 	public async parse(
@@ -24,12 +24,14 @@ export class InviteType extends SyntaxType<any> {
 			});
 		}
 
-		const syntax = await client.fetchInvite(arg).catch((err) => {
+		const invite = await client.fetchInvite(arg).catch((err) => {
 			throw new SyntaxParserError("VALUE_ERROR", {
 				arg,
 				index,
 				syntax: this,
 			});
 		});
+
+		return invite;
 	}
 }

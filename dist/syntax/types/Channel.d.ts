@@ -1,10 +1,10 @@
-import { Message } from "discord.js";
+import { Message, TextChannel } from "discord.js";
 import { FloofiClient } from "../../FloofiClient";
 import { SyntaxType } from "../SyntaxType";
 /**
  * Syntax type used to effectively disable syntax parsing.
  */
-export declare class ChannelType extends SyntaxType<any> {
+export declare class ChannelType extends SyntaxType<TextChannel> {
     typeName: string;
-    parse(client: FloofiClient, message: Message, arg: string): string;
+    parse(client: FloofiClient, message: Message, arg: string, index: number): TextChannel;
 }

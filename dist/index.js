@@ -27,8 +27,7 @@ exports.withGroup = CommandGroup_2.withGroup;
 // Syntax
 const Providers = require("./providers");
 exports.Providers = Providers;
-const syntax = require("./syntax");
 const Util = require("./util");
 exports.Util = Util;
-const SyntaxTypes = syntax.types;
-exports.SyntaxTypes = SyntaxTypes;
+var syntax_1 = require("./syntax");
+exports.TYPES = syntax_1.TYPES;

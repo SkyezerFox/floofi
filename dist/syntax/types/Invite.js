@@ -18,13 +18,14 @@ class InviteType extends SyntaxType_1.SyntaxType {
                 syntax: this,
             });
         }
-        const syntax = await client.fetchInvite(arg).catch((err) => {
+        const invite = await client.fetchInvite(arg).catch((err) => {
             throw new SyntaxParserError_1.SyntaxParserError("VALUE_ERROR", {
                 arg,
                 index,
                 syntax: this,
             });
         });
+        return invite;
     }
 }
 exports.InviteType = InviteType;

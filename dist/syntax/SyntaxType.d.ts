@@ -11,7 +11,7 @@ export declare const DEFAULT_SYNTAX_OPTIONS: SyntaxTypeOptions;
 /**
  * Class for representing syntax types
  */
-export declare abstract class SyntaxType<Type extends ParseableType> {
+export declare abstract class SyntaxType<Type extends ParseableType | Promise<ParseableType>> {
     /**
      * Returns whether the argument is rest
      */
@@ -46,5 +46,5 @@ export declare abstract class SyntaxType<Type extends ParseableType> {
      * @param {string} value - Value parsed from the message
      * @param {number} index - Current index of the argument
      */
-    parse(client: FloofiClient, message: Message, value: string, index: number): Type;
+    parse(client: FloofiClient, message: Message, value: string, index: number): Type | Promise<Type>;
 }

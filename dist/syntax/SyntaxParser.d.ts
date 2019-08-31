@@ -1,10 +1,10 @@
-import { Channel, GuildMember, Invite, Message, Role, TextChannel, User, VoiceChannel } from "discord.js";
+import { Channel, GuildMember, Invite, Message, Role, TextChannel, User } from "discord.js";
 import { FloofiClient } from "../FloofiClient";
 import { SyntaxType } from "./SyntaxType";
-export declare type ParseableType = boolean | number | string | Channel | GuildMember | Invite | VoiceChannel | Role | TextChannel | User;
+export declare type ParseableType = boolean | number | string | Channel | GuildMember | Invite | Role | TextChannel | User;
 export declare type ReturnableType = ParseableType | ParseableType[];
 export declare type ExtractParseableType<T extends ReturnableType> = T extends ParseableType[] ? ParseableType[][number] : T;
-export declare type ParseableTypeRepresentation = "boolean" | "number" | "string" | "channel" | "guild" | "member" | "role" | "user";
+export declare type ParseableTypeRepresentation = "boolean" | "number" | "string" | "channel" | "guild" | "invite" | "member" | "role" | "user" | "vc";
 /**
  * Class for dealing with syntax parsing
  */
@@ -31,11 +31,6 @@ export declare class SyntaxParser<T extends ReturnableType[]> {
      * @param syntax Syntax parsing to perform on the flag
      */
     addFlag(flagName: string | string[], syntax: string): this;
-    /**
-     * Remove a flag from the parser.
-     * @param flagName Name or alias of the flag
-     */
-    removeFlag(flagName: string): this;
     /**
      * Parses message content into valid values
      */
