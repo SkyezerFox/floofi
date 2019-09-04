@@ -147,7 +147,13 @@ export class SyntaxParser<T extends ReturnableType[]> {
 			this._syntax = syntax;
 		} else {
 			this.multiSyntax = false;
-			this._syntax = syntax.split(" ");
+
+			if (syntax === "") {
+				this._syntax = [];
+			} else {
+				this._syntax = syntax.split(" ");
+			}
+
 		}
 
 		this._flags = [];
@@ -331,19 +337,19 @@ export class SyntaxParser<T extends ReturnableType[]> {
 
 		if (!typeNameMatch) {
 			throw new SyntaxParserError("INTERNAL_ERROR", {
-				message: `Invalid type name`,
+				message: `Invalid type name: ${s}`,
 			});
 		}
 
 		if (!typeMatch) {
 			throw new SyntaxParserError("INTERNAL_ERROR", {
-				message: "Invalid type",
+				message: `Invalid type: ${s}`,
 			});
 		}
 
 		if (!valid) {
 			throw new SyntaxParserError("INTERNAL_ERROR", {
-				message: "Invalid syntax string",
+				message: `Invalid syntax string: ${s}`,
 			});
 		}
 

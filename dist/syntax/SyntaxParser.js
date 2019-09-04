@@ -67,7 +67,12 @@ class SyntaxParser {
         }
         else {
             this.multiSyntax = false;
-            this._syntax = syntax.split(" ");
+            if (syntax === "") {
+                this._syntax = [];
+            }
+            else {
+                this._syntax = syntax.split(" ");
+            }
         }
         this._flags = [];
         this.syntax = [];
@@ -211,17 +216,17 @@ class SyntaxParser {
         // Check if syntax string is valid
         if (!typeNameMatch) {
             throw new SyntaxParserError_1.SyntaxParserError("INTERNAL_ERROR", {
-                message: `Invalid type name`,
+                message: `Invalid type name: ${s}`,
             });
         }
         if (!typeMatch) {
             throw new SyntaxParserError_1.SyntaxParserError("INTERNAL_ERROR", {
-                message: "Invalid type",
+                message: `Invalid type: ${s}`,
             });
         }
         if (!valid) {
             throw new SyntaxParserError_1.SyntaxParserError("INTERNAL_ERROR", {
-                message: "Invalid syntax string",
+                message: `Invalid syntax string: ${s}`,
             });
         }
         const type = typeMatch[0];

@@ -21,7 +21,6 @@ export { withGroup } from "./structures/commands/CommandGroup";
 
 // Syntax
 import * as Providers from "./providers";
-import * as syntax from "./syntax";
 import * as Util from "./util";
 
 export { TYPES } from "./syntax";
