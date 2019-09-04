@@ -1,11 +1,7 @@
 import { Message, RichEmbed } from "discord.js";
 
 import { FloofiClient } from "../../FloofiClient";
-import {
-	ParseableType,
-	ReturnableType,
-	SyntaxParser,
-} from "../../syntax/SyntaxParser";
+import { ParseableType, ReturnableType, SyntaxParser } from "../../syntax/SyntaxParser";
 import { SyntaxParserError } from "../../syntax/SyntaxParserError";
 import { SyntaxType } from "../../syntax/SyntaxType";
 import { smallErrorEmbed } from "../../util/EmbedUtil";
@@ -22,7 +18,6 @@ interface CommandHelp {
 
 interface CommandOptions {
 	name: string;
-	syntax: Array<SyntaxType<ParseableType>>;
 	permissionLevel: number;
 
 	aliases?: string[];
@@ -58,14 +53,50 @@ export class Command<ArgumentTypes extends ReturnableType[] = []> {
 		this.executor = executor;
 		this.parser = new SyntaxParser(syntax);
 
+		if (name === "remove") {
+			console.log("next command construction");
+		}
+
+		if (
+			typeof syntax === "string" &&
+			syntax.split(" ")[1] &&
+			syntax.split(" ")[1].startsWith("description")
+		) {
+			console.log("- Assigning command options");
+		}
+
 		this.options = {
 			name,
 			permissionLevel,
-			syntax: this.parser.syntax,
 		};
+		if (
+			typeof syntax === "string" &&
+			syntax.split(" ")[1] &&
+			syntax.split(" ")[1].startsWith("description")
+		) {
+			console.log("- Done");
+			console.log("- Assinging defaults...");
+		}
 
 		this.options = Object.assign(this.options, DEFAULT_COMMAND_OPTIONS);
+
+		if (
+			typeof syntax === "string" &&
+			syntax.split(" ")[1] &&
+			syntax.split(" ")[1].startsWith("description")
+		) {
+			console.log("- Done");
+			console.log("- Assinging parsed options...");
+		}
 		this.options = Object.assign(this.options, opts);
+
+		if (
+			typeof syntax === "string" &&
+			syntax.split(" ")[1] &&
+			syntax.split(" ")[1].startsWith("description")
+		) {
+			console.log("- Done");
+		}
 	}
 
 	/**
@@ -83,9 +114,7 @@ export class Command<ArgumentTypes extends ReturnableType[] = []> {
 	 */
 	public async run(client: FloofiClient, message: Message, depth: number) {
 		client.logger.debug(
-			`[cmds][${
-				this.name
-			}] Checking if member has permission to run command...`,
+			`[cmds][${this.name}] Checking if member has permission to run command...`,
 		);
 		if (
 			!(await client.provider.hasPermission(
@@ -150,9 +179,7 @@ export class Command<ArgumentTypes extends ReturnableType[] = []> {
 
 		client.logger.info(
 			`[cmd] ${message.author.tag}` +
-				`(${message.author.id}/${message.guild.id}:${
-					message.channel.id
-				}) => ${this.options.name}`,
+				`(${message.author.id}/${message.guild.id}:${message.channel.id}) => ${this.options.name}`,
 		);
 
 		this.executor(client, message, args);

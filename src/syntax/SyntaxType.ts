@@ -49,6 +49,8 @@ export abstract class SyntaxType<
 
 	public options: SyntaxTypeOptions;
 
+	private _rest: boolean;
+
 	constructor(name: string, extras?: Partial<SyntaxTypeOptions>) {
 		if (this.constructor.name === "SyntaxType") {
 			throw Error("The SyntaxType class may not be instantiated.");
@@ -56,6 +58,29 @@ export abstract class SyntaxType<
 		this.name = name;
 
 		this.options = Object.assign(DEFAULT_SYNTAX_OPTIONS, extras);
+
+		if (this.name === "description") {
+			console.log(
+				"SUPER ASSIGNMENT",
+				Object.assign(DEFAULT_SYNTAX_OPTIONS, extras),
+			);
+			console.log("---------------------------");
+
+			console.log("Defining debug rest property");
+			Object.defineProperty(this.options, "rest", {
+				get: () => {
+					console.log("Rest option accessed");
+					return this._rest;
+				},
+				set: (v) => {
+					console.log("Rest set to", v);
+					this._rest = v;
+				},
+			});
+
+			this._rest = this.options.rest;
+			setInterval(() => console.log(this._rest), 1e3);
+		}
 	}
 
 	/**
@@ -63,6 +88,7 @@ export abstract class SyntaxType<
 	 * @param toggle Whether the argument is rest or not
 	 */
 	public isRest(toggle = true) {
+		console.log("boop");
 		this.options.rest = toggle;
 	}
 

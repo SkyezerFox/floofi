@@ -1,7 +1,6 @@
 import { Message } from "discord.js";
 import { FloofiClient } from "../../FloofiClient";
-import { ParseableType, ReturnableType, SyntaxParser } from "../../syntax/SyntaxParser";
-import { SyntaxType } from "../../syntax/SyntaxType";
+import { ReturnableType, SyntaxParser } from "../../syntax/SyntaxParser";
 interface ExtraCommandOptions {
     aliases?: string[];
     guild?: string;
@@ -12,7 +11,6 @@ interface CommandHelp {
 }
 interface CommandOptions {
     name: string;
-    syntax: Array<SyntaxType<ParseableType>>;
     permissionLevel: number;
     aliases?: string[];
     guild?: string;

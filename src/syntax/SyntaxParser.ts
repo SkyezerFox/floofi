@@ -1,20 +1,8 @@
-import {
-	Channel,
-	GuildMember,
-	Invite,
-	Message,
-	Role,
-	TextChannel,
-	User,
-} from "discord.js";
+import { Channel, GuildMember, Invite, Message, Role, TextChannel, User } from "discord.js";
 
 import { FloofiClient } from "../FloofiClient";
 import { SyntaxParserError } from "./SyntaxParserError";
-import {
-	SyntaxType,
-	SyntaxTypeConstructor,
-	SyntaxTypeOptions,
-} from "./SyntaxType";
+import { SyntaxType, SyntaxTypeConstructor, SyntaxTypeOptions } from "./SyntaxType";
 import * as types from "./types";
 
 // Type definitions
@@ -153,7 +141,6 @@ export class SyntaxParser<T extends ReturnableType[]> {
 			} else {
 				this._syntax = syntax.split(" ");
 			}
-
 		}
 
 		this._flags = [];
@@ -282,7 +269,7 @@ export class SyntaxParser<T extends ReturnableType[]> {
 		for (let i = 0; i < args.length; i++) {
 			const arg = args[i];
 
-			if (!onRestArgument && this.syntax[i].isRest) {
+			if (!onRestArgument && this.syntax[i].rest) {
 				onRestArgument = true;
 			}
 
@@ -320,6 +307,10 @@ export class SyntaxParser<T extends ReturnableType[]> {
 			this.flags = this._flags.map((f) => this.createFlag(f));
 		}
 
+		if (this.syntax.find((v) => v.name === "description")) {
+			console.log("Refresh complete.");
+		}
+
 		return this;
 	}
 
@@ -353,11 +344,22 @@ export class SyntaxParser<T extends ReturnableType[]> {
 			});
 		}
 
+		let rest = false;
+		let optional = false;
+
+		const restMatch = s.match(restMatcher);
+		const optionalMatch = s.match(optionalMatcher);
+
+		if (restMatch && restMatch[0] === "...") {
+			rest = true;
+		}
+
+		if (optionalMatch && optionalMatch[0] === "?") {
+			optional = true;
+		}
+
 		const type = typeMatch[0] as ParseableTypeRepresentation;
 		const typeName = typeNameMatch[0];
-
-		const rest = restMatcher.test(s);
-		const optional = optionalMatcher.test(s);
 
 		return createType(typeName, type, { rest, optional });
 	}

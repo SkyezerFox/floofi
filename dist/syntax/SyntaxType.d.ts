@@ -24,6 +24,7 @@ export declare abstract class SyntaxType<Type extends ParseableType | Promise<Pa
     typeName: string;
     name: string;
     options: SyntaxTypeOptions;
+    private _rest;
     constructor(name: string, extras?: Partial<SyntaxTypeOptions>);
     /**
      * Makes the argument rest, or sets rest mode on this arg.

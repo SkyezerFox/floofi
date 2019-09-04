@@ -172,7 +172,7 @@ class SyntaxParser {
         /** @todo Support asynchronous types */
         for (let i = 0; i < args.length; i++) {
             const arg = args[i];
-            if (!onRestArgument && this.syntax[i].isRest) {
+            if (!onRestArgument && this.syntax[i].rest) {
                 onRestArgument = true;
             }
             const syntaxIndex = onRestArgument ? this.syntax.length - 1 : i;
@@ -203,6 +203,9 @@ class SyntaxParser {
         if (this._flags.length !== this.flags.length) {
             this.flags = this._flags.map((f) => this.createFlag(f));
         }
+        if (this.syntax.find((v) => v.name === "description")) {
+            console.log("Refresh complete.");
+        }
         return this;
     }
     /**
@@ -229,10 +232,18 @@ class SyntaxParser {
                 message: `Invalid syntax string: ${s}`,
             });
         }
+        let rest = false;
+        let optional = false;
+        const restMatch = s.match(restMatcher);
+        const optionalMatch = s.match(optionalMatcher);
+        if (restMatch && restMatch[0] === "...") {
+            rest = true;
+        }
+        if (optionalMatch && optionalMatch[0] === "?") {
+            optional = true;
+        }
         const type = typeMatch[0];
         const typeName = typeNameMatch[0];
-        const rest = restMatcher.test(s);
-        const optional = optionalMatcher.test(s);
         return createType(typeName, type, { rest, optional });
     }
     /**

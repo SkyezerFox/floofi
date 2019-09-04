@@ -26,9 +26,25 @@ export class StringType extends SyntaxType<string> {
 
 	constructor(name: string, extras?: Partial<StringTypeOptions>) {
 		// Enable concat
-		super(name, Object.assign(extras, { concat: true }));
+		super(name, Object.assign(DEFAULT_STRINGTYPE_OPTIONS, extras));
+		if (name === "description") {
+			console.log(
+				"SUPER CALLED",
+				Object.assign(DEFAULT_SYNTAX_OPTIONS, extras),
+			);
+			console.log(Object.assign(DEFAULT_SYNTAX_OPTIONS, extras).rest);
+			console.log("---------------------------");
+		}
 
 		this.options = Object.assign(DEFAULT_STRINGTYPE_OPTIONS, extras);
+		if (name === "description") {
+			console.log(
+				"STRING ASSIGNED",
+				Object.assign(DEFAULT_STRINGTYPE_OPTIONS, extras),
+			);
+			console.log(Object.assign(DEFAULT_STRINGTYPE_OPTIONS, extras).rest);
+			console.log("---------------------------");
+		}
 	}
 
 	public parse(
