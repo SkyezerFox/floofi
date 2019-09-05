@@ -6,10 +6,6 @@ const SyntaxType_1 = require("../SyntaxType");
  * Syntax type used to represent boolean values.
  */
 class BooleanType extends SyntaxType_1.SyntaxType {
-    constructor() {
-        super(...arguments);
-        this.typeName = "boolean";
-    }
     parse(client, message, arg, index) {
         const normalized = arg.toLowerCase();
         if (/(yes|no|on|off|true|false|0|1|y|n)/.test(normalized)) {
@@ -22,4 +18,5 @@ class BooleanType extends SyntaxType_1.SyntaxType {
         return /(yes|on|true|0|y)/.test(normalized);
     }
 }
+BooleanType.typeName = "boolean";
 exports.BooleanType = BooleanType;

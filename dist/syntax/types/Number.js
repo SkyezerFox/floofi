@@ -6,10 +6,6 @@ const SyntaxType_1 = require("../SyntaxType");
  * Syntax type for representing numbers.
  */
 class NumberType extends SyntaxType_1.SyntaxType {
-    constructor() {
-        super(...arguments);
-        this.typeName = "number";
-    }
     parse(client, message, arg, index) {
         const int = parseInt(arg, 10);
         if (isNaN(int)) {
@@ -22,4 +18,5 @@ class NumberType extends SyntaxType_1.SyntaxType {
         return int;
     }
 }
+NumberType.typeName = "number";
 exports.NumberType = NumberType;

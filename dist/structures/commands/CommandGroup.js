@@ -22,7 +22,6 @@ class CommandGroup {
      * @param cmds Commands to add
      */
     addCommand(...cmds) {
-        console.log("# Adding commands...");
         cmds.forEach((cmd) => {
             this.commands.set(cmd.options.name, cmd);
             if (cmd.options.aliases) {
@@ -53,7 +52,6 @@ class CommandGroup {
                 this.addGroup(v);
             }
         });
-        console.log("# Finished adding to group.");
         return this;
     }
     /**

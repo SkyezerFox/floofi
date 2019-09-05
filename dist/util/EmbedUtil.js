@@ -33,6 +33,6 @@ exports.smallCheckEmbed = (msg) => new discord_js_1.RichEmbed()
  */
 exports.bigCheckEmbed = (title, msg) => new discord_js_1.RichEmbed()
     .setTitle(`:white_check_mark: ${title}`)
-    .setDescription(`msg`)
+    .setDescription(msg)
     .setColor(0x55ff55)
     .setTimestamp();

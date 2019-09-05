@@ -8,7 +8,7 @@ import { SyntaxType } from "../SyntaxType";
  * Syntax type for representing numbers.
  */
 export class NumberType extends SyntaxType<number> {
-	public typeName = "number";
+	public static typeName = "number";
 
 	public parse(
 		client: FloofiClient,

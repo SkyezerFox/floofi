@@ -45,6 +45,6 @@ export const smallCheckEmbed = (msg: string) =>
 export const bigCheckEmbed = (title: string, msg: string) =>
 	new RichEmbed()
 		.setTitle(`:white_check_mark: ${title}`)
-		.setDescription(`msg`)
+		.setDescription(msg)
 		.setColor(0x55ff55)
 		.setTimestamp();

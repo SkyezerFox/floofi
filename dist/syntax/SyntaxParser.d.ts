@@ -1,10 +1,10 @@
 import { Channel, GuildMember, Invite, Message, Role, TextChannel, User } from "discord.js";
 import { FloofiClient } from "../FloofiClient";
 import { SyntaxType } from "./SyntaxType";
-export declare type ParseableType = boolean | number | string | Channel | GuildMember | Invite | Role | TextChannel | User;
+export declare type ParseableType = any | boolean | number | string | Channel | GuildMember | Invite | Role | TextChannel | User;
 export declare type ReturnableType = ParseableType | ParseableType[];
 export declare type ExtractParseableType<T extends ReturnableType> = T extends ParseableType[] ? ParseableType[][number] : T;
-export declare type ParseableTypeRepresentation = "boolean" | "number" | "string" | "channel" | "guild" | "invite" | "member" | "role" | "user" | "vc";
+export declare type ParseableTypeRepresentation = "any" | "boolean" | "number" | "string" | "channel" | "guild" | "invite" | "member" | "role" | "user" | "vc";
 /**
  * Class for dealing with syntax parsing
  */

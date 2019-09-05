@@ -2,11 +2,12 @@ import { Channel, GuildMember, Invite, Message, Role, TextChannel, User } from "
 
 import { FloofiClient } from "../FloofiClient";
 import { SyntaxParserError } from "./SyntaxParserError";
-import { SyntaxType, SyntaxTypeConstructor, SyntaxTypeOptions } from "./SyntaxType";
+import { SyntaxType, SyntaxTypeConstructor } from "./SyntaxType";
 import * as types from "./types";
 
 // Type definitions
 export type ParseableType =
+	| any
 	| boolean
 	| number
 	| string
@@ -23,6 +24,7 @@ export type ExtractParseableType<
 > = T extends ParseableType[] ? ParseableType[][number] : T;
 
 export type ParseableTypeRepresentation =
+	| "any"
 	| "boolean"
 	| "number"
 	| "string"
@@ -36,6 +38,7 @@ export type ParseableTypeRepresentation =
 
 // Array of valid type names
 const validTypes = [
+	"any",
 	"boolean",
 	"number",
 	"string",
@@ -110,9 +113,11 @@ const typeMap: { [x: string]: SyntaxTypeConstructor } = {
 const createType = (
 	name: string,
 	type: ParseableTypeRepresentation,
-	extras?: Partial<SyntaxTypeOptions>,
+	optional: boolean,
+	rest: boolean,
+	extras?: Partial<{}>,
 ) => {
-	return new typeMap[type](name, extras);
+	return new typeMap[type](name, optional, rest, extras);
 };
 
 /**
@@ -232,7 +237,7 @@ export class SyntaxParser<T extends ReturnableType[]> {
 				}
 
 				// if syntax is required
-				if (!syntax.isOptional) {
+				if (!syntax.optional) {
 					// if no argument exists
 					if (!args[i]) {
 						return i;
@@ -255,7 +260,7 @@ export class SyntaxParser<T extends ReturnableType[]> {
 		// If there are too many arguments, and the last argument isn't rest
 		if (
 			args.length > this.syntax.length &&
-			!this.syntax[this.syntax.length - 1].isOptional
+			!this.syntax[this.syntax.length - 1].rest
 		) {
 			throw new SyntaxParserError("PARSE_ERROR", {
 				arg: args[this.syntax.length],
@@ -305,10 +310,6 @@ export class SyntaxParser<T extends ReturnableType[]> {
 
 		if (this._flags.length !== this.flags.length) {
 			this.flags = this._flags.map((f) => this.createFlag(f));
-		}
-
-		if (this.syntax.find((v) => v.name === "description")) {
-			console.log("Refresh complete.");
 		}
 
 		return this;
@@ -361,7 +362,7 @@ export class SyntaxParser<T extends ReturnableType[]> {
 		const type = typeMatch[0] as ParseableTypeRepresentation;
 		const typeName = typeNameMatch[0];
 
-		return createType(typeName, type, { rest, optional });
+		return createType(typeName, type, optional, rest);
 	}
 
 	/**

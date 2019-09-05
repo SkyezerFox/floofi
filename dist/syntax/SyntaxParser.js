@@ -4,6 +4,7 @@ const SyntaxParserError_1 = require("./SyntaxParserError");
 const types = require("./types");
 // Array of valid type names
 const validTypes = [
+    "any",
     "boolean",
     "number",
     "string",
@@ -53,8 +54,8 @@ const typeMap = {
  * Util function that creates types from string representnations
  * @param type
  */
-const createType = (name, type, extras) => {
-    return new typeMap[type](name, extras);
+const createType = (name, type, optional, rest, extras) => {
+    return new typeMap[type](name, optional, rest, extras);
 };
 /**
  * Class for dealing with syntax parsing
@@ -145,7 +146,7 @@ class SyntaxParser {
                 return failed;
             }
             // if syntax is required
-            if (!syntax.isOptional) {
+            if (!syntax.optional) {
                 // if no argument exists
                 if (!args[i]) {
                     return i;
@@ -162,7 +163,7 @@ class SyntaxParser {
         }
         // If there are too many arguments, and the last argument isn't rest
         if (args.length > this.syntax.length &&
-            !this.syntax[this.syntax.length - 1].isOptional) {
+            !this.syntax[this.syntax.length - 1].rest) {
             throw new SyntaxParserError_1.SyntaxParserError("PARSE_ERROR", {
                 arg: args[this.syntax.length],
                 index: this.syntax.length,
@@ -203,9 +204,6 @@ class SyntaxParser {
         if (this._flags.length !== this.flags.length) {
             this.flags = this._flags.map((f) => this.createFlag(f));
         }
-        if (this.syntax.find((v) => v.name === "description")) {
-            console.log("Refresh complete.");
-        }
         return this;
     }
     /**
@@ -244,7 +242,7 @@ class SyntaxParser {
         }
         const type = typeMatch[0];
         const typeName = typeNameMatch[0];
-        return createType(typeName, type, { rest, optional });
+        return createType(typeName, type, optional, rest);
     }
     /**
      * Creates a syntax flag from a string

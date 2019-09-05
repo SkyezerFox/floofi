@@ -8,7 +8,7 @@ import { SyntaxType } from "../SyntaxType";
  * Syntax type used to effectively disable syntax parsing.
  */
 export class MemberType extends SyntaxType<GuildMember> {
-	public typeName = "member";
+	public static typeName = "member";
 
 	public parse(
 		client: FloofiClient,

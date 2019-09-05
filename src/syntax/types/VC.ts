@@ -1,10 +1,4 @@
-import {
-	Channel,
-	GuildChannel,
-	Message,
-	TextChannel,
-	VoiceChannel,
-} from "discord.js";
+import { Channel, GuildChannel, Message, TextChannel, VoiceChannel } from "discord.js";
 
 import { FloofiClient } from "../../FloofiClient";
 import { SyntaxParserError } from "../SyntaxParserError";
@@ -14,7 +8,7 @@ import { SyntaxType } from "../SyntaxType";
  * Syntax type used to effectively disable syntax parsing.
  */
 export class VCType extends SyntaxType<VoiceChannel> {
-	public typeName = "channel";
+	public static typeName = "channel";
 
 	public parse(
 		client: FloofiClient,

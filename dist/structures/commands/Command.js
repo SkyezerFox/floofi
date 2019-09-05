@@ -11,37 +11,12 @@ class Command {
     constructor(name, syntax, permissionLevel, executor, opts) {
         this.executor = executor;
         this.parser = new SyntaxParser_1.SyntaxParser(syntax);
-        if (name === "remove") {
-            console.log("next command construction");
-        }
-        if (typeof syntax === "string" &&
-            syntax.split(" ")[1] &&
-            syntax.split(" ")[1].startsWith("description")) {
-            console.log("- Assigning command options");
-        }
         this.options = {
             name,
             permissionLevel,
         };
-        if (typeof syntax === "string" &&
-            syntax.split(" ")[1] &&
-            syntax.split(" ")[1].startsWith("description")) {
-            console.log("- Done");
-            console.log("- Assinging defaults...");
-        }
         this.options = Object.assign(this.options, DEFAULT_COMMAND_OPTIONS);
-        if (typeof syntax === "string" &&
-            syntax.split(" ")[1] &&
-            syntax.split(" ")[1].startsWith("description")) {
-            console.log("- Done");
-            console.log("- Assinging parsed options...");
-        }
         this.options = Object.assign(this.options, opts);
-        if (typeof syntax === "string" &&
-            syntax.split(" ")[1] &&
-            syntax.split(" ")[1].startsWith("description")) {
-            console.log("- Done");
-        }
     }
     /**
      * The name of the command

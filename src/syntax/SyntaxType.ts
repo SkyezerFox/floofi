@@ -5,20 +5,10 @@ import { ParseableType } from "./SyntaxParser";
 
 export type SyntaxTypeConstructor = new (
 	name: string,
-	extras?: Partial<SyntaxTypeOptions>,
+	optional: boolean,
+	rest: boolean,
+	extras?: Partial<{}>,
 ) => SyntaxType<any>;
-
-export interface SyntaxTypeOptions {
-	concat: boolean;
-	optional: boolean;
-	rest: boolean;
-}
-
-export const DEFAULT_SYNTAX_OPTIONS: SyntaxTypeOptions = {
-	concat: false,
-	optional: false,
-	rest: false,
-};
 
 /**
  * Class for representing syntax types
@@ -26,88 +16,30 @@ export const DEFAULT_SYNTAX_OPTIONS: SyntaxTypeOptions = {
 export abstract class SyntaxType<
 	Type extends ParseableType | Promise<ParseableType>
 > {
-	/**
-	 * Returns whether the argument is rest
-	 */
-	get rest() {
-		return this.options.rest;
-	}
+	public readonly rest: boolean;
+	public readonly optional: boolean;
 
-	/**
-	 * Gets whether the argument is optional
-	 */
-	get optional() {
-		return this.options.optional;
-	}
+	public readonly typeName = "SyntaxType";
+	public readonly argName: string;
 
-	get concat() {
-		return this.options.concat;
-	}
+	public options: {};
 
-	public typeName = "SyntaxType";
-	public name: string;
-
-	public options: SyntaxTypeOptions;
-
-	private _rest: boolean;
-
-	constructor(name: string, extras?: Partial<SyntaxTypeOptions>) {
+	constructor(
+		name: string,
+		optional = true,
+		rest = false,
+		extras?: Partial<{}>,
+	) {
 		if (this.constructor.name === "SyntaxType") {
 			throw Error("The SyntaxType class may not be instantiated.");
 		}
-		this.name = name;
+		this.argName = name;
 
-		this.options = Object.assign(DEFAULT_SYNTAX_OPTIONS, extras);
+		this.optional = optional;
+		this.rest = rest;
 
-		if (this.name === "description") {
-			console.log(
-				"SUPER ASSIGNMENT",
-				Object.assign(DEFAULT_SYNTAX_OPTIONS, extras),
-			);
-			console.log("---------------------------");
-
-			console.log("Defining debug rest property");
-			Object.defineProperty(this.options, "rest", {
-				get: () => {
-					console.log("Rest option accessed");
-					return this._rest;
-				},
-				set: (v) => {
-					console.log("Rest set to", v);
-					this._rest = v;
-				},
-			});
-
-			this._rest = this.options.rest;
-			setInterval(() => console.log(this._rest), 1e3);
-		}
+		this.options = Object.assign({}, extras);
 	}
-
-	/**
-	 * Makes the argument rest, or sets rest mode on this arg.
-	 * @param toggle Whether the argument is rest or not
-	 */
-	public isRest(toggle = true) {
-		console.log("boop");
-		this.options.rest = toggle;
-	}
-
-	/**
-	 * Makes the argument optional, or sets optional status on this arg.
-	 * @param toggle Whether the argument is optional or not
-	 */
-	public isOptional(toggle = true) {
-		this.options.optional = toggle;
-	}
-
-	/**
-	 * Makes the argument concatenable, or sets concatenation enabled on this arg.
-	 * @param toggle Whether or not the argument is concatenable
-	 */
-	public isConcat(toggle = true) {
-		this.options.concat = toggle;
-	}
-
 	/**
 	 * Attempt to parse the given string argument into the type's output
 	 * @param {FloofiClient} client - The client object

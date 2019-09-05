@@ -6,10 +6,6 @@ const SyntaxType_1 = require("../SyntaxType");
  * Syntax type used to effectively disable syntax parsing.
  */
 class VCType extends SyntaxType_1.SyntaxType {
-    constructor() {
-        super(...arguments);
-        this.typeName = "channel";
-    }
     parse(client, message, arg, index) {
         const name = arg.match(/#[a-zA-Z0-9 \-]+/);
         const validSnowflake = arg.match(/(?<=<#)[0-9]+(?=>)/);
@@ -45,4 +41,5 @@ class VCType extends SyntaxType_1.SyntaxType {
         return channel;
     }
 }
+VCType.typeName = "channel";
 exports.VCType = VCType;
