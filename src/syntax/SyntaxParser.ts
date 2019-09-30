@@ -1,20 +1,8 @@
-import {
-	Channel,
-	GuildMember,
-	Invite,
-	Message,
-	Role,
-	TextChannel,
-	User,
-} from "discord.js";
+import { Channel, GuildMember, Invite, Message, Role, TextChannel, User } from "discord.js";
 
 import { FloofiClient } from "../FloofiClient";
 import { SyntaxParserError } from "./SyntaxParserError";
-import {
-	SyntaxType,
-	SyntaxTypeConstructor,
-	SyntaxTypeOptions,
-} from "./SyntaxType";
+import { SyntaxType, SyntaxTypeConstructor, SyntaxTypeOptions } from "./SyntaxType";
 import * as types from "./types";
 
 // Type definitions
@@ -153,7 +141,6 @@ export class SyntaxParser<T extends ReturnableType[]> {
 			} else {
 				this._syntax = syntax.split(" ");
 			}
-
 		}
 
 		this._flags = [];

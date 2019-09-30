@@ -7,3 +7,5 @@ exports.bigErrorEmbed = EmbedUtil_1.bigErrorEmbed;
 exports.smallCheckEmbed = EmbedUtil_1.smallCheckEmbed;
 const Constants = require("./Constants");
 exports.Constants = Constants;
+const TSUtil = require("./TSUtil");
+exports.TSUtil = TSUtil;
