@@ -1,4 +1,3 @@
-/// <reference path="../../../node_modules/discord.js/typings/index.d.ts" />
 import { Collection } from "discord.js";
 import { EventEmitter } from "events";
 import { Logger } from "winston";

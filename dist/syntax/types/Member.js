@@ -12,7 +12,7 @@ class MemberType extends SyntaxType_1.SyntaxType {
     }
     parse(client, message, arg, index) {
         const name = arg.match(/@.*#[0-9]{4}/);
-        const validSnowflake = arg.match(/(?<=<@)[0-9]+(?=>)/);
+        const validSnowflake = arg.match(/(?<=<@!?)[0-9]+(?=>)/);
         if (!validSnowflake && !name) {
             throw new SyntaxParserError_1.SyntaxParserError("PARSE_ERROR", {
                 arg,

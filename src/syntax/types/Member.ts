@@ -17,7 +17,7 @@ export class MemberType extends SyntaxType<GuildMember> {
 		index: number,
 	) {
 		const name = arg.match(/@.*#[0-9]{4}/);
-		const validSnowflake = arg.match(/(?<=<@)[0-9]+(?=>)/);
+		const validSnowflake = arg.match(/(?<=<@!?)[0-9]+(?=>)/);
 
 		if (!validSnowflake && !name) {
 			throw new SyntaxParserError("PARSE_ERROR", {
