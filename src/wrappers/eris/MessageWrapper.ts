@@ -1,7 +1,7 @@
 import { Message as ErisMessage } from "eris";
 
-import { Client } from "../ErisClient";
-import { exists } from "../util/Util";
+import { Client } from "../../ErisClient";
+import { exists } from "../../util/Util";
 
 const EquivalentMessageObjectKeys = ["content", "cleanContent"];
 

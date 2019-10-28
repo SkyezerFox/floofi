@@ -2,7 +2,7 @@ import { Message as ErisMessage, User as ErisUser } from "eris";
 import { isNullOrUndefined } from "util";
 
 import { Client } from "../ErisClient";
-import { Message } from "../wrappers/MessageWrapper";
+import { Message } from "../wrappers/eris/MessageWrapper";
 import { User } from "../wrappers/UserWrapper";
 
 /**

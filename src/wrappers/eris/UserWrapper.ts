@@ -1,7 +1,8 @@
-import { User as ErisUser } from "eris";
+import { MessageContent, MessageFile, PrivateChannel, User as ErisUser } from "eris";
 
 import { Client } from "../ErisClient";
 import { exists } from "../util/Util";
+import { Message } from "./MessageWrapper";
 
 const EquivalentUserObjectKeys = ["id", "username", "discriminator", "bot"];
 
@@ -18,6 +19,7 @@ export declare interface User {
 
 export class User {
 	public client: Client;
+	public dmChannel?: PrivateChannel;
 
 	// Store the original user object.
 	// tslint:disable-next-line: variable-name
@@ -73,5 +75,15 @@ export class User {
 	 */
 	get avatarIsDefault(): boolean {
 		return exists(this._user.avatar);
+	}
+
+	public async send(content: MessageContent, file?: MessageFile) {
+		if (this.dmChannel) {
+			return new Message(
+				this.client,
+				await this.dmChannel.createMessage(content, file),
+			);
+		}
+		const channel = await this._user.getDMChannel();
 	}
 }
