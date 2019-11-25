@@ -1,1 +1,1 @@
-export type Listener<Args = undefined> = (args: Args) => any;
+export type Listener<Args extends [] = []> = (...args: Args) => any;
