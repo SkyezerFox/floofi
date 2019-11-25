@@ -8,61 +8,12 @@
 
 ## About
 
-This library has gone through too many rewrites.... I think this version might actually be usable.
+floofi is an isomorphic wrapper for the Discord API. Behind the scenes, the library uses [discord.js](https://discord.js.org), [eris](https://github.com/abalabahaha/eris), and/or [discordie](https://github.com/qeled/discordie), allowing for simultaneous and consistent development using either of the three libraries, while adding features that the child libraries don't have themselves.
 
-floofi is a wrapper for the already powerful [discord.js](https://discord.js.org) module, providing tools and utilities otherwise unavailable in the base library.
+## Isomorphic Rewrite
 
-## Installation
+The rewrite in order to enable the isomorphic behaviour described is still underway - **this is very much a work in progress library.** I cannot guaruntee that anything works as it should.
 
-**I have not tested this library below Node.js 10.** I suggest you use the latest suggested version, as this is the version I'm developing the library in.
+## Contributors
 
-Using [NPM](https://npmjs.org):
-
-`npm install floofi`
-
-Or, using [yarn](https://yarnpkg.org):
-
-`yarn add floofi`
-
-## Example usage
-
-```js
-const floofi = require("floofi");
-const client = new floofi.Client();
-
-client.on("ready", () => {
-	console.log(`Logged in as ${client.user.tag}!`);
-});
-
-client.add(
-	new floofi.Command("ping", 0, "", (client, message, arguments) => {
-		return message.reply("Pong!");
-	})
-);
-
-client.login("token");
-```
-
-or, using TypeScript:
-
-```ts
-import * as floofi from "floofi";
-const client = new floofi.Client();
-
-client.add(
-	new floofi.Command<[number, number]>(
-		"add",
-		0,
-		"a:number b:number",
-		(client, message, arguments) => {
-			return message.reply(arguments[0] + arguments[1]);
-		}
-	)
-);
-
-client.login("token");
-```
-
-## Help
-
-If you have any questions/issues that aren't already answered here, feel free to contact me on [Twitter](https://twitter.com/orifoxx).
+- [@orifoxx](https://github.com/orifoxx)
