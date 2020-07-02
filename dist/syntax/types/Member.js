@@ -6,10 +6,6 @@ const SyntaxType_1 = require("../SyntaxType");
  * Syntax type used to effectively disable syntax parsing.
  */
 class MemberType extends SyntaxType_1.SyntaxType {
-    constructor() {
-        super(...arguments);
-        this.typeName = "member";
-    }
     parse(client, message, arg, index) {
         const name = arg.match(/@.*#[0-9]{4}/);
         const validSnowflake = arg.match(/(?<=<@!?)[0-9]+(?=>)/);
@@ -38,4 +34,5 @@ class MemberType extends SyntaxType_1.SyntaxType {
         return member;
     }
 }
+MemberType.typeName = "member";
 exports.MemberType = MemberType;

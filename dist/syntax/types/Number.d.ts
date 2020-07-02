@@ -5,6 +5,6 @@ import { SyntaxType } from "../SyntaxType";
  * Syntax type for representing numbers.
  */
 export declare class NumberType extends SyntaxType<number> {
-    typeName: string;
+    static typeName: string;
     parse(client: FloofiClient, message: Message, arg: string, index: number): number;
 }

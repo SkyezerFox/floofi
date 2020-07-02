@@ -1,57 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DEFAULT_SYNTAX_OPTIONS = {
-    concat: false,
-    optional: false,
-    rest: false,
-};
 /**
  * Class for representing syntax types
  */
 class SyntaxType {
-    constructor(name, extras) {
+    constructor(name, optional = true, rest = false, extras) {
         this.typeName = "SyntaxType";
         if (this.constructor.name === "SyntaxType") {
             throw Error("The SyntaxType class may not be instantiated.");
         }
-        this.name = name;
-        this.options = Object.assign(exports.DEFAULT_SYNTAX_OPTIONS, extras);
-    }
-    /**
-     * Returns whether the argument is rest
-     */
-    get rest() {
-        return this.options.rest;
-    }
-    /**
-     * Gets whether the argument is optional
-     */
-    get optional() {
-        return this.options.optional;
-    }
-    get concat() {
-        return this.options.concat;
-    }
-    /**
-     * Makes the argument rest, or sets rest mode on this arg.
-     * @param toggle Whether the argument is rest or not
-     */
-    isRest(toggle = true) {
-        this.options.rest = toggle;
-    }
-    /**
-     * Makes the argument optional, or sets optional status on this arg.
-     * @param toggle Whether the argument is optional or not
-     */
-    isOptional(toggle = true) {
-        this.options.optional = toggle;
-    }
-    /**
-     * Makes the argument concatenable, or sets concatenation enabled on this arg.
-     * @param toggle Whether or not the argument is concatenable
-     */
-    isConcat(toggle = true) {
-        this.options.concat = toggle;
+        this.argName = name;
+        this.optional = optional;
+        this.rest = rest;
+        this.options = Object.assign({}, extras);
     }
     /**
      * Attempt to parse the given string argument into the type's output

@@ -1,11 +1,7 @@
 import { Message, RichEmbed } from "discord.js";
 
 import { FloofiClient } from "../../FloofiClient";
-import {
-	ParseableType,
-	ReturnableType,
-	SyntaxParser,
-} from "../../syntax/SyntaxParser";
+import { ParseableType, ReturnableType, SyntaxParser } from "../../syntax/SyntaxParser";
 import { SyntaxParserError } from "../../syntax/SyntaxParserError";
 import { SyntaxType } from "../../syntax/SyntaxType";
 import { smallErrorEmbed } from "../../util/EmbedUtil";
@@ -22,7 +18,6 @@ interface CommandHelp {
 
 interface CommandOptions {
 	name: string;
-	syntax: Array<SyntaxType<ParseableType>>;
 	permissionLevel: number;
 
 	aliases?: string[];
@@ -61,10 +56,10 @@ export class Command<ArgumentTypes extends ReturnableType[] = []> {
 		this.options = {
 			name,
 			permissionLevel,
-			syntax: this.parser.syntax,
 		};
 
 		this.options = Object.assign(this.options, DEFAULT_COMMAND_OPTIONS);
+
 		this.options = Object.assign(this.options, opts);
 	}
 
@@ -83,9 +78,7 @@ export class Command<ArgumentTypes extends ReturnableType[] = []> {
 	 */
 	public async run(client: FloofiClient, message: Message, depth: number) {
 		client.logger.debug(
-			`[cmds][${
-				this.name
-			}] Checking if member has permission to run command...`,
+			`[cmds][${this.name}] Checking if member has permission to run command...`,
 		);
 		if (
 			!(await client.provider.hasPermission(
@@ -150,9 +143,7 @@ export class Command<ArgumentTypes extends ReturnableType[] = []> {
 
 		client.logger.info(
 			`[cmd] ${message.author.tag}` +
-				`(${message.author.id}/${message.guild.id}:${
-					message.channel.id
-				}) => ${this.options.name}`,
+				`(${message.author.id}/${message.guild.id}:${message.channel.id}) => ${this.options.name}`,
 		);
 
 		this.executor(client, message, args);

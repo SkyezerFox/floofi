@@ -8,7 +8,7 @@ import { SyntaxType } from "../SyntaxType";
  * Syntax type used to represent boolean values.
  */
 export class BooleanType extends SyntaxType<boolean> {
-	public typeName = "boolean";
+	public static typeName = "boolean";
 
 	public parse(
 		client: FloofiClient,

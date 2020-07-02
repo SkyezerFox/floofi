@@ -4,6 +4,7 @@ const SyntaxParserError_1 = require("./SyntaxParserError");
 const types = require("./types");
 // Array of valid type names
 const validTypes = [
+    "any",
     "boolean",
     "number",
     "string",
@@ -53,8 +54,8 @@ const typeMap = {
  * Util function that creates types from string representnations
  * @param type
  */
-const createType = (name, type, extras) => {
-    return new typeMap[type](name, extras);
+const createType = (name, type, optional, rest, extras) => {
+    return new typeMap[type](name, optional, rest, extras);
 };
 /**
  * Class for dealing with syntax parsing
@@ -145,7 +146,7 @@ class SyntaxParser {
                 return failed;
             }
             // if syntax is required
-            if (!syntax.isOptional) {
+            if (!syntax.optional) {
                 // if no argument exists
                 if (!args[i]) {
                     return i;
@@ -162,7 +163,7 @@ class SyntaxParser {
         }
         // If there are too many arguments, and the last argument isn't rest
         if (args.length > this.syntax.length &&
-            !this.syntax[this.syntax.length - 1].isOptional) {
+            !this.syntax[this.syntax.length - 1].rest) {
             throw new SyntaxParserError_1.SyntaxParserError("PARSE_ERROR", {
                 arg: args[this.syntax.length],
                 index: this.syntax.length,
@@ -172,7 +173,7 @@ class SyntaxParser {
         /** @todo Support asynchronous types */
         for (let i = 0; i < args.length; i++) {
             const arg = args[i];
-            if (!onRestArgument && this.syntax[i].isRest) {
+            if (!onRestArgument && this.syntax[i].rest) {
                 onRestArgument = true;
             }
             const syntaxIndex = onRestArgument ? this.syntax.length - 1 : i;
@@ -229,11 +230,19 @@ class SyntaxParser {
                 message: `Invalid syntax string: ${s}`,
             });
         }
+        let rest = false;
+        let optional = false;
+        const restMatch = s.match(restMatcher);
+        const optionalMatch = s.match(optionalMatcher);
+        if (restMatch && restMatch[0] === "...") {
+            rest = true;
+        }
+        if (optionalMatch && optionalMatch[0] === "?") {
+            optional = true;
+        }
         const type = typeMatch[0];
         const typeName = typeNameMatch[0];
-        const rest = restMatcher.test(s);
-        const optional = optionalMatcher.test(s);
-        return createType(typeName, type, { rest, optional });
+        return createType(typeName, type, optional, rest);
     }
     /**
      * Creates a syntax flag from a string

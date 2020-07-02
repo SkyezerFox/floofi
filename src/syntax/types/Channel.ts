@@ -8,7 +8,7 @@ import { SyntaxType } from "../SyntaxType";
  * Syntax type used to effectively disable syntax parsing.
  */
 export class ChannelType extends SyntaxType<TextChannel> {
-	public typeName = "channel";
+	public static typeName = "channel";
 
 	public parse(
 		client: FloofiClient,

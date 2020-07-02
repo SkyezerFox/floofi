@@ -14,7 +14,6 @@ class Command {
         this.options = {
             name,
             permissionLevel,
-            syntax: this.parser.syntax,
         };
         this.options = Object.assign(this.options, DEFAULT_COMMAND_OPTIONS);
         this.options = Object.assign(this.options, opts);

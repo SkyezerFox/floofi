@@ -1,24 +1,13 @@
-import {
-	Channel,
-	GuildMember,
-	Invite,
-	Message,
-	Role,
-	TextChannel,
-	User,
-} from "discord.js";
+import { Channel, GuildMember, Invite, Message, Role, TextChannel, User } from "discord.js";
 
 import { FloofiClient } from "../FloofiClient";
 import { SyntaxParserError } from "./SyntaxParserError";
-import {
-	SyntaxType,
-	SyntaxTypeConstructor,
-	SyntaxTypeOptions,
-} from "./SyntaxType";
+import { SyntaxType, SyntaxTypeConstructor } from "./SyntaxType";
 import * as types from "./types";
 
 // Type definitions
 export type ParseableType =
+	| any
 	| boolean
 	| number
 	| string
@@ -35,6 +24,7 @@ export type ExtractParseableType<
 > = T extends ParseableType[] ? ParseableType[][number] : T;
 
 export type ParseableTypeRepresentation =
+	| "any"
 	| "boolean"
 	| "number"
 	| "string"
@@ -48,6 +38,7 @@ export type ParseableTypeRepresentation =
 
 // Array of valid type names
 const validTypes = [
+	"any",
 	"boolean",
 	"number",
 	"string",
@@ -122,9 +113,11 @@ const typeMap: { [x: string]: SyntaxTypeConstructor } = {
 const createType = (
 	name: string,
 	type: ParseableTypeRepresentation,
-	extras?: Partial<SyntaxTypeOptions>,
+	optional: boolean,
+	rest: boolean,
+	extras?: Partial<{}>,
 ) => {
-	return new typeMap[type](name, extras);
+	return new typeMap[type](name, optional, rest, extras);
 };
 
 /**
@@ -153,7 +146,6 @@ export class SyntaxParser<T extends ReturnableType[]> {
 			} else {
 				this._syntax = syntax.split(" ");
 			}
-
 		}
 
 		this._flags = [];
@@ -245,7 +237,7 @@ export class SyntaxParser<T extends ReturnableType[]> {
 				}
 
 				// if syntax is required
-				if (!syntax.isOptional) {
+				if (!syntax.optional) {
 					// if no argument exists
 					if (!args[i]) {
 						return i;
@@ -268,7 +260,7 @@ export class SyntaxParser<T extends ReturnableType[]> {
 		// If there are too many arguments, and the last argument isn't rest
 		if (
 			args.length > this.syntax.length &&
-			!this.syntax[this.syntax.length - 1].isOptional
+			!this.syntax[this.syntax.length - 1].rest
 		) {
 			throw new SyntaxParserError("PARSE_ERROR", {
 				arg: args[this.syntax.length],
@@ -282,7 +274,7 @@ export class SyntaxParser<T extends ReturnableType[]> {
 		for (let i = 0; i < args.length; i++) {
 			const arg = args[i];
 
-			if (!onRestArgument && this.syntax[i].isRest) {
+			if (!onRestArgument && this.syntax[i].rest) {
 				onRestArgument = true;
 			}
 
@@ -353,13 +345,24 @@ export class SyntaxParser<T extends ReturnableType[]> {
 			});
 		}
 
+		let rest = false;
+		let optional = false;
+
+		const restMatch = s.match(restMatcher);
+		const optionalMatch = s.match(optionalMatcher);
+
+		if (restMatch && restMatch[0] === "...") {
+			rest = true;
+		}
+
+		if (optionalMatch && optionalMatch[0] === "?") {
+			optional = true;
+		}
+
 		const type = typeMatch[0] as ParseableTypeRepresentation;
 		const typeName = typeNameMatch[0];
 
-		const rest = restMatcher.test(s);
-		const optional = optionalMatcher.test(s);
-
-		return createType(typeName, type, { rest, optional });
+		return createType(typeName, type, optional, rest);
 	}
 
 	/**

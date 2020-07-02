@@ -76,7 +76,6 @@ export class CommandGroup {
 				this.addGroup(v);
 			}
 		});
-
 		return this;
 	}
 
